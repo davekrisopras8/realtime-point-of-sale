@@ -8,21 +8,49 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Form } from "@/components/ui/form";
 import {
-  Form,
-} from "@/components/ui/form";
-import { INITIAL_LOGIN_FORM } from "@/constants/auth-constants";
-import { LoginForm, loginSchema } from "@/validations/auth-validations";
+  INITIAL_LOGIN_FORM,
+  INITIAL_STATE_LOGIN_FORM,
+} from "@/constants/auth-constants";
+import { LoginForm, loginSchemaForm } from "@/validations/auth-validations";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { startTransition, useActionState, useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { login } from "../actions";
+import { Loader } from "lucide-react";
 
 export default function Login() {
   const form = useForm<LoginForm>({
-    resolver: zodResolver(loginSchema),
+    resolver: zodResolver(loginSchemaForm),
     defaultValues: INITIAL_LOGIN_FORM,
   });
 
-  const onSubmit = form.handleSubmit(async (data) => {});
+  const [loginState, loginAction, isPendingLogin] = useActionState(
+    login,
+    INITIAL_STATE_LOGIN_FORM
+  );
+
+  const onSubmit = form.handleSubmit(async (data) => {
+    const formData = new FormData();
+    Object.entries(data).forEach(([key, value]) => {
+      formData.append(key, value);
+    });
+
+    startTransition(() => {
+      loginAction(formData);
+    });
+  });
+
+  useEffect(() => {
+    if(loginState?.status === 'error') {
+      startTransition(() => {
+        loginAction(null)
+      })
+    }
+  }, [loginState])
+
+  console.log(loginState)
 
   return (
     <Card>
@@ -48,7 +76,7 @@ export default function Login() {
               type="password"
             />
             <Button type="submit" className="w-full">
-              Login
+              {isPendingLogin ? <Loader className="animate-spin"/> : 'Login'}
             </Button>
           </form>
         </Form>
