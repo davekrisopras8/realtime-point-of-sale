@@ -19,6 +19,7 @@ import { startTransition, useActionState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { login } from "../actions";
 import { Loader } from "lucide-react";
+import { toast } from "sonner";
 
 export default function Login() {
   const form = useForm<LoginForm>({
@@ -43,14 +44,15 @@ export default function Login() {
   });
 
   useEffect(() => {
-    if(loginState?.status === 'error') {
+    if (loginState?.status === "error") {
+      toast.error("Login Failed", {
+        description: loginState.errors?._form?.[0],
+      });
       startTransition(() => {
-        loginAction(null)
-      })
+        loginAction(null);
+      });
     }
-  }, [loginState])
-
-  console.log(loginState)
+  }, [loginState]);
 
   return (
     <Card>
@@ -76,7 +78,7 @@ export default function Login() {
               type="password"
             />
             <Button type="submit" className="w-full">
-              {isPendingLogin ? <Loader className="animate-spin"/> : 'Login'}
+              {isPendingLogin ? <Loader className="animate-spin" /> : "Login"}
             </Button>
           </form>
         </Form>
