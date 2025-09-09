@@ -1,6 +1,6 @@
 "use server";
 
-import { INITIAL_STATE_LOGIN_FORM } from "@/constants/auth-constants";
+import { INITIAL_STATE_LOGIN_FORM } from "@/constants/auth-constant";
 import { createClient } from "@/lib/supabase/server";
 import { AuthFormState } from "@/types/auth";
 import { loginSchemaForm } from "@/validations/auth-validations";
