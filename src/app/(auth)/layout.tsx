@@ -15,7 +15,7 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
       <div className="flex flex-col gap-4 p-6 md:p-10">
         <div className="flex items-center gap-2 font-medium w-full">
           <Link href="/" className="flex items-center gap-2 font-medium">
-            <div className="bg-gray-900 flex size-6 items-center justify-center rounded-md">
+            <div className="bg-cyan-500 flex size-6 items-center justify-center rounded-md">
               <ChefHat className="size-4 text-white" />
             </div>
             Dakries Café & Resto
