@@ -1,4 +1,3 @@
-import { DarkmodeToggle } from "@/components/common/darkmode-toggle";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
@@ -9,7 +8,7 @@ export default function Home() {
         Welcome, Dave Krisopras Essanto
       </h1>
       <Link href="/manager">
-        <Button className="bg-cyan-500 text-white">Access Dashboard</Button>
+        <Button className="bg-cyan-500 text-white hover:bg-cyan-700">Access Dashboard</Button>
       </Link>
     </div>
   );
