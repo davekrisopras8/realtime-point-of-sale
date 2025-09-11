@@ -77,7 +77,7 @@ export default function Login() {
               placeholder="Your password"
               type="password"
             />
-            <Button type="submit" className="w-full">
+            <Button type="submit" className="w-full bg-cyan-500 hover:bg-cyan-700">
               {isPendingLogin ? <Loader className="animate-spin" /> : "Login"}
             </Button>
           </form>
