@@ -11,6 +11,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Pencil, Trash2 } from "lucide-react";
 import { useMemo } from "react";
 import { toast } from "sonner";
+import DialogCreateUser from "./dialog-create-user";
 
 export default function UserManagement() {
   const supabase = createClient();
@@ -24,7 +25,7 @@ export default function UserManagement() {
     handleChangeSearch,
   } = useDataTable();
 
-  const { data: users, isLoading } = useQuery({
+  const { data: users, isLoading, refetch } = useQuery({
     queryKey: ["users", currentPage, currentLimit, currentSearch],
     queryFn: async () => {
       const result = await supabase
@@ -100,6 +101,7 @@ export default function UserManagement() {
             <DialogTrigger asChild>
               <Button variant="outline">Create</Button>
             </DialogTrigger>
+            <DialogCreateUser refetch={refetch}/>
           </Dialog>
         </div>
       </div>
