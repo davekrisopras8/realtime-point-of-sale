@@ -38,3 +38,18 @@ export const INITIAL_STATE_CREATE_USER = {
     _form: [],
   },
 };
+
+export const ROLE_LIST = [
+  {
+    value: "manager",
+    label: "Manager",
+  },
+  {
+    value: "kitchen",
+    label: "Kitchen",
+  },
+  {
+    value: "cashier",
+    label: "Cashier",
+  },
+];
