@@ -3,7 +3,7 @@ import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
 type CreateClientOptions = {
-  isManager?: false;
+  isManager?: boolean;
 };
 
 export async function createClient({ isManager = false }: CreateClientOptions = {}) {
