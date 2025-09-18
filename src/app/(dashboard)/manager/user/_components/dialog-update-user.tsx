@@ -29,7 +29,6 @@ export default function DialogUpdateUser({
 }) {
   const form = useForm<UpdateUserForm>({
     resolver: zodResolver(updateUserSchema),
-    defaultValues: INITIAL_CREATE_USER_FORM,
   });
 
   const [preview, setPreview] = useState<Preview | undefined>(undefined);
