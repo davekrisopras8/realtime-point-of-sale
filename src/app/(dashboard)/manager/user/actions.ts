@@ -5,7 +5,7 @@ import { AuthFormState } from "@/types/auth";
 import {
   createUserSchema,
   updateUserSchema,
-} from "@/validations/auth-validations";
+} from "@/validations/auth-validation";
 
 export async function createUser(prevState: AuthFormState, formData: FormData) {
   let validatedFields = createUserSchema.safeParse({

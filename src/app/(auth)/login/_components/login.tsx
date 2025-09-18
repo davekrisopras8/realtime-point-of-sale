@@ -13,7 +13,7 @@ import {
   INITIAL_LOGIN_FORM,
   INITIAL_STATE_LOGIN_FORM,
 } from "@/constants/auth-constant";
-import { LoginForm, loginSchemaForm } from "@/validations/auth-validations";
+import { LoginForm, loginSchemaForm } from "@/validations/auth-validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { startTransition, useActionState, useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -77,7 +77,10 @@ export default function Login() {
               placeholder="Your password"
               type="password"
             />
-            <Button type="submit" className="w-full bg-cyan-500 hover:bg-cyan-700">
+            <Button
+              type="submit"
+              className="w-full bg-cyan-500 hover:bg-cyan-700"
+            >
               {isPendingLogin ? <Loader className="animate-spin" /> : "Login"}
             </Button>
           </form>

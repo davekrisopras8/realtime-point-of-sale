@@ -5,7 +5,7 @@ import {
 import {
   UpdateUserForm,
   updateUserSchema,
-} from "@/validations/auth-validations";
+} from "@/validations/auth-validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { startTransition, useActionState, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";

@@ -3,7 +3,7 @@
 import { INITIAL_STATE_LOGIN_FORM } from "@/constants/auth-constant";
 import { createClient } from "@/lib/supabase/server";
 import { AuthFormState } from "@/types/auth";
-import { loginSchemaForm } from "@/validations/auth-validations";
+import { loginSchemaForm } from "@/validations/auth-validation";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";

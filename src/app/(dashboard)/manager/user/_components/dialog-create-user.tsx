@@ -5,7 +5,7 @@ import {
 import {
   CreateUserForm,
   createUserSchema,
-} from "@/validations/auth-validations";
+} from "@/validations/auth-validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { startTransition, useActionState, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -20,9 +20,7 @@ export default function DialogCreateUser({ refetch }: { refetch: () => void }) {
     defaultValues: INITIAL_CREATE_USER_FORM,
   });
 
-  const [preview, setPreview] = useState<
-    Preview | undefined
-  >(undefined);
+  const [preview, setPreview] = useState<Preview | undefined>(undefined);
 
   const [createUserState, createUserAction, isPendingCreateUser] =
     useActionState(createUser, INITIAL_STATE_CREATE_USER);
@@ -55,6 +53,13 @@ export default function DialogCreateUser({ refetch }: { refetch: () => void }) {
   }, [createUserState]);
 
   return (
-    <FormUser form={form} onSubmit={onSubmit} isLoading={isPendingCreateUser} type="Create" preview={preview} setPreview={setPreview}/>
+    <FormUser
+      form={form}
+      onSubmit={onSubmit}
+      isLoading={isPendingCreateUser}
+      type="Create"
+      preview={preview}
+      setPreview={setPreview}
+    />
   );
 }
