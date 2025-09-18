@@ -14,6 +14,7 @@ import { Menu } from "@/validations/menu-validation";
 import Image from "next/image";
 import { cn, convertIDR } from "@/lib/utils";
 import { HEADER_TABLE_MENU } from "@/constants/menu-constant";
+import DialogCreateMenu from "./dialog-create-menu";
 
 export default function MenuManagement() {
   const supabase = createClient();
@@ -73,7 +74,7 @@ export default function MenuManagement() {
     return (menus?.data || []).map((menu: Menu, index) => {
       return [
         currentLimit * (currentPage - 1) + index + 1,
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 pr-8 lg:pr-0">
           <Image
             src={menu.image_url as string}
             alt={menu.name}
@@ -85,10 +86,10 @@ export default function MenuManagement() {
         </div>,
         menu.category,
         <div>
-          <p>Base: {convertIDR(menu.price)}</p>
+          <p>Price: {convertIDR(menu.price)}</p>
           <p>Discount: {menu.discount}%</p>
           <p>
-            After Discount:{" "}
+            Total Price:{" "}
             {convertIDR(menu.price - (menu.price * menu.discount) / 100)}
           </p>
         </div>,
@@ -157,6 +158,7 @@ export default function MenuManagement() {
             <DialogTrigger asChild>
               <Button variant="outline">Create</Button>
             </DialogTrigger>
+            <DialogCreateMenu refetch={refetch}/>
           </Dialog>
         </div>
       </div>
