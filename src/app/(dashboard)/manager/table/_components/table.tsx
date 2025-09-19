@@ -1,22 +1,23 @@
-"use client";
-import DataTable from "@/components/common/data-table";
-import DropdownAction from "@/components/common/dropdown-action";
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogTrigger } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import useDataTable from "@/hooks/use-data-table";
-import { createClient } from "@/lib/supabase/client";
-import { useQuery } from "@tanstack/react-query";
-import { Pencil, Trash2 } from "lucide-react";
-import { useMemo, useState } from "react";
-import { toast } from "sonner";
-import { cn } from "@/lib/utils";
-import { Table } from "@/validations/table-validation";
-import { HEADER_TABLE_TABLE } from "@/constants/table-constant";
+'use client';
+
+import DataTable from '@/components/common/data-table';
+import DropdownAction from '@/components/common/dropdown-action';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogTrigger } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import useDataTable from '@/hooks/use-data-table';
+import { createClient } from '@/lib/supabase/client';
+import { useQuery } from '@tanstack/react-query';
+import { Pencil, Trash2 } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
+import { Table } from '@/validations/table-validation';
+import { HEADER_TABLE_TABLE } from '@/constants/table-constant';
+import DialogCreateTable from './dialog-create-table';
 
 export default function TableManagement() {
   const supabase = createClient();
-
   const {
     currentPage,
     currentLimit,
@@ -25,33 +26,31 @@ export default function TableManagement() {
     handleChangeLimit,
     handleChangeSearch,
   } = useDataTable();
-
   const {
     data: tables,
     isLoading,
     refetch,
   } = useQuery({
-    queryKey: ["tables", currentPage, currentLimit, currentSearch],
+    queryKey: ['tables', currentPage, currentLimit, currentSearch],
     queryFn: async () => {
       const query = supabase
-        .from("tables")
-        .select("*", { count: "exact" })
+        .from('tables')
+        .select('*', { count: 'exact' })
         .range((currentPage - 1) * currentLimit, currentPage * currentLimit - 1)
-        .order("created_at");
+        .order('created_at');
 
       if (currentSearch) {
         query.or(
-          `name.ilike.%${currentSearch}%,capacity.ilike.%${currentSearch}%,,status.ilike.%${currentSearch}%`
+          `name.ilike.%${currentSearch}%,capacity.ilike.%${currentSearch}%,status.ilike.%${currentSearch}%`,
         );
       }
 
       const result = await query;
 
-      if (result.error) {
-        toast.error("Get table data failed", {
+      if (result.error)
+        toast.error('Get Table data failed', {
           description: result.error.message,
         });
-      }
 
       return result;
     },
@@ -59,13 +58,11 @@ export default function TableManagement() {
 
   const [selectedAction, setSelectedAction] = useState<{
     data: Table;
-    type: "update" | "delete";
+    type: 'update' | 'delete';
   } | null>(null);
 
   const handleChangeAction = (open: boolean) => {
-    if (!open) {
-      setSelectedAction(null);
-    }
+    if (!open) setSelectedAction(null);
   };
 
   const filteredData = useMemo(() => {
@@ -78,10 +75,10 @@ export default function TableManagement() {
         </div>,
         table.capacity,
         <div
-          className={cn("px-2 py-1 rounded-full text-white w-fit capitalize", {
-            "bg-green-600": table.status === "Available",
-            "bg-red-600": table.status === "Unavailable",
-            "bg-yellow-600": table.status === "Reserved",
+          className={cn('px-2 py-1 rounded-full text-white w-fit capitalize', {
+            'bg-cyan-500': table.status === 'Available',
+            'bg-red-500': table.status === 'Unavailable',
+            'bg-stone-100 text-gray-950': table.status === 'Reserved',
           })}
         >
           {table.status}
@@ -90,7 +87,7 @@ export default function TableManagement() {
           menu={[
             {
               label: (
-                <span className="flex items-center gap-2">
+                <span className="flex item-center gap-2">
                   <Pencil />
                   Edit
                 </span>
@@ -98,22 +95,22 @@ export default function TableManagement() {
               action: () => {
                 setSelectedAction({
                   data: table,
-                  type: "update",
+                  type: 'update',
                 });
               },
             },
             {
               label: (
-                <span className="flex items-center gap-2">
+                <span className="flex item-center gap-2">
                   <Trash2 className="text-red-400" />
                   Delete
                 </span>
               ),
-              variant: "destructive",
+              variant: 'destructive',
               action: () => {
                 setSelectedAction({
                   data: table,
-                  type: "delete",
+                  type: 'delete',
                 });
               },
             },
@@ -137,19 +134,19 @@ export default function TableManagement() {
           <Input
             placeholder="Search by name, capacity and status"
             onChange={(e) => handleChangeSearch(e.target.value)}
-            className="w-[250px]"
           />
           <Dialog>
             <DialogTrigger asChild>
               <Button variant="outline">Create</Button>
             </DialogTrigger>
+            <DialogCreateTable refetch={refetch} />
           </Dialog>
         </div>
       </div>
       <DataTable
         header={HEADER_TABLE_TABLE}
-        isLoading={isLoading}
         data={filteredData}
+        isLoading={isLoading}
         totalPages={totalPages}
         currentPage={currentPage}
         currentLimit={currentLimit}
