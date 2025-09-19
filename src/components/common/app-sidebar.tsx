@@ -64,7 +64,7 @@ export default function AppSidebar() {
                         className={cn(
                           "px-4 py-3 h-auto transition-colors",
                           pathname === item.url
-                            ? "bg-cyan-500 text-white hover:!bg-cyan-700 hover:!text-white"
+                            ? "bg-cyan-500 text-white hover:!bg-cyan-600 hover:!text-white"
                             : "hover:bg-cyan-500 hover:text-cyan-500"
                         )}
                       >
