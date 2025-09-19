@@ -15,6 +15,7 @@ import DialogCreateUser from "./dialog-create-user";
 import { Profile } from "@/types/auth";
 import DialogUpdateUser from "./dialog-update-user";
 import DialogDeleteUser from "./dialog-delete-user";
+import Image from "next/image";
 
 export default function UserManagement() {
   const supabase = createClient();
@@ -70,8 +71,18 @@ export default function UserManagement() {
     return (users?.data || []).map((user, index) => {
       return [
         currentLimit * (currentPage - 1) + index + 1,
-        user.id,
-        user.name,
+        <div className="flex items-center gap-2 pr-8 lg:pr-0">
+          <div className="relative w-10 h-10">
+            <Image
+              src={user.avatar_url as string}
+              alt={user.name}
+              fill
+              className="rounded-full object-cover"
+            />
+          </div>
+          <span>{user.name}</span>
+        </div>,
+
         user.role,
         <DropdownAction
           menu={[
