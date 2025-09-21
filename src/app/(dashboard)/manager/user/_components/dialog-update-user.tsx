@@ -1,7 +1,4 @@
-import {
-  INITIAL_CREATE_USER_FORM,
-  INITIAL_STATE_UPDATE_USER,
-} from "@/constants/auth-constant";
+import { INITIAL_STATE_UPDATE_USER } from "@/constants/auth-constant";
 import {
   UpdateUserForm,
   updateUserSchema,
@@ -15,6 +12,7 @@ import { Preview } from "@/types/general";
 import FormUser from "./form-user";
 import { Profile } from "@/types/auth";
 import { Dialog } from "@/components/ui/dialog";
+import { useAuthStore } from "@/stores/auth-store";
 
 export default function DialogUpdateUser({
   refetch,
@@ -32,7 +30,7 @@ export default function DialogUpdateUser({
   });
 
   const [preview, setPreview] = useState<Preview | undefined>(undefined);
-
+  const { user, setProfile } = useAuthStore();
   const [updateUserState, updateUserAction, isPendingUpdateUser] =
     useActionState(updateUser, INITIAL_STATE_UPDATE_USER);
 
@@ -62,17 +60,32 @@ export default function DialogUpdateUser({
   useEffect(() => {
     if (updateUserState?.status === "error") {
       toast.error("Update User Failed", {
+        id: `update-user-error-${currentData?.id}`,
         description: updateUserState.errors?._form?.[0],
       });
     }
 
     if (updateUserState?.status === "success") {
-      toast.success("Update User Success");
+      toast.success("Update User Success", {
+        id: `update-user-success-${currentData?.id}`,
+      });
+
+      if (user?.id === currentData?.id && currentData) {
+        const updatedProfile = {
+          id: currentData.id,
+          name: form.getValues("name"),
+          role: form.getValues("role"),
+          avatar_url:
+            preview?.displayUrl || (form.getValues("avatar_url") as string),
+        };
+        setProfile(updatedProfile);
+      }
+
       form.reset();
       handleChangeAction?.(false);
       refetch();
     }
-  }, [updateUserState]);
+  }, [updateUserState?.status]);
 
   useEffect(() => {
     if (currentData) {

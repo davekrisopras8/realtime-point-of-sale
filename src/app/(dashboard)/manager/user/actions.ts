@@ -6,6 +6,8 @@ import {
   createUserSchema,
   updateUserSchema,
 } from "@/validations/auth-validation";
+import { revalidatePath } from "next/cache";
+import { cookies } from "next/headers";
 
 export async function createUser(prevState: AuthFormState, formData: FormData) {
   let validatedFields = createUserSchema.safeParse({
@@ -146,6 +148,29 @@ export async function updateUser(prevState: AuthFormState, formData: FormData) {
       },
     };
   }
+
+  const cookiesStore = await cookies();
+  const currentProfile = JSON.parse(
+    cookiesStore.get("user_profile")?.value ?? "{}"
+  );
+
+  if (currentProfile.id === formData.get("id")) {
+    const updatedProfile = {
+      ...currentProfile,
+      name: validatedFields.data.name,
+      role: validatedFields.data.role,
+      avatar_url: validatedFields.data.avatar_url,
+    };
+
+    cookiesStore.set("user_profile", JSON.stringify(updatedProfile), {
+      httpOnly: false,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 60 * 60 * 24 * 7, // 7 days
+    });
+  }
+
+  revalidatePath("/manager/user");
 
   return {
     status: "success",

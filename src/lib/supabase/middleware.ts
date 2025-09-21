@@ -7,8 +7,7 @@ export async function updateSession(request: NextRequest) {
     request,
   });
 
-  const { SUPABASE_URL, SUPABASE_ANON_KEY} =
-    environment;
+  const { SUPABASE_URL, SUPABASE_ANON_KEY } = environment;
 
   const supabase = createServerClient(SUPABASE_URL!, SUPABASE_ANON_KEY!, {
     cookies: {
@@ -43,5 +42,22 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  return supabaseResponse
+  if (user && !request.cookies.get("user_profile")) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", user.id)
+      .single();
+
+    if (profile) {
+      supabaseResponse.cookies.set("user_profile", JSON.stringify(profile), {
+        httpOnly: false,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 60 * 60 * 24 * 7, // 7 days
+      });
+    }
+  }
+
+  return supabaseResponse;
 }
