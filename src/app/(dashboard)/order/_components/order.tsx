@@ -1,19 +1,20 @@
-'use client';
+"use client";
 
-import DataTable from '@/components/common/data-table';
-import DropdownAction from '@/components/common/dropdown-action';
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogTrigger } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import useDataTable from '@/hooks/use-data-table';
-import { createClient } from '@/lib/supabase/client';
-import { useQuery } from '@tanstack/react-query';
-import { Pencil, Trash2 } from 'lucide-react';
-import { useMemo, useState } from 'react';
-import { toast } from 'sonner';
-import { cn } from '@/lib/utils';
-import { Table } from '@/validations/table-validation';
-import { HEADER_TABLE_ORDER } from '@/constants/order-constant';
+import DataTable from "@/components/common/data-table";
+import DropdownAction from "@/components/common/dropdown-action";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import useDataTable from "@/hooks/use-data-table";
+import { createClient } from "@/lib/supabase/client";
+import { useQuery } from "@tanstack/react-query";
+import { Pencil, Trash2 } from "lucide-react";
+import { useMemo, useState } from "react";
+import { toast } from "sonner";
+import { cn } from "@/lib/utils";
+import { Table } from "@/validations/table-validation";
+import { HEADER_TABLE_ORDER } from "@/constants/order-constant";
+import DialogCreateOrder from "./dialog-create-order";
 
 export default function OrderManagement() {
   const supabase = createClient();
@@ -30,29 +31,29 @@ export default function OrderManagement() {
     isLoading,
     refetch,
   } = useQuery({
-    queryKey: ['orders', currentPage, currentLimit, currentSearch],
+    queryKey: ["orders", currentPage, currentLimit, currentSearch],
     queryFn: async () => {
       const query = supabase
-        .from('orders')
+        .from("orders")
         .select(
           `
             id, order_id, customer_name, status, payment_url, tables (name, id)
             `,
-          { count: 'exact' },
+          { count: "exact" }
         )
         .range((currentPage - 1) * currentLimit, currentPage * currentLimit - 1)
-        .order('created_at');
+        .order("created_at");
 
       if (currentSearch) {
         query.or(
-          `order_id.ilike.%${currentSearch}%,customer_name.ilike.%${currentSearch}%`,
+          `order_id.ilike.%${currentSearch}%,customer_name.ilike.%${currentSearch}%`
         );
       }
 
       const result = await query;
 
       if (result.error)
-        toast.error('Get Order data failed', {
+        toast.error("Get Order data failed", {
           description: result.error.message,
         });
 
@@ -60,9 +61,22 @@ export default function OrderManagement() {
     },
   });
 
+  const { data: tables, refetch: refetchTables } = useQuery({
+    queryKey: ["tables"],
+    queryFn: async () => {
+      const result = await supabase
+        .from("tables")
+        .select("*")
+        .order("created_at")
+        .order("status");
+
+      return result.data;
+    },
+  });
+
   const [selectedAction, setSelectedAction] = useState<{
     data: Table;
-    type: 'update' | 'delete';
+    type: "update" | "delete";
   } | null>(null);
 
   const handleChangeAction = (open: boolean) => {
@@ -77,11 +91,11 @@ export default function OrderManagement() {
         order.customer_name,
         (order.tables as unknown as { name: string }).name,
         <div
-          className={cn('px-2 py-1 rounded-full text-white w-fit capitalize', {
-            'bg-lime-600': order.status === 'settled',
-            'bg-sky-600': order.status === 'process',
-            'bg-amber-600': order.status === 'reserved',
-            'bg-red-600': order.status === 'canceled',
+          className={cn("px-2 py-1 rounded-full text-white w-fit capitalize", {
+            "bg-lime-600": order.status === "settled",
+            "bg-sky-600": order.status === "process",
+            "bg-amber-600": order.status === "reserved",
+            "bg-red-600": order.status === "canceled",
           })}
         >
           {order.status}
@@ -110,6 +124,7 @@ export default function OrderManagement() {
             <DialogTrigger asChild>
               <Button variant="outline">Create</Button>
             </DialogTrigger>
+            <DialogCreateOrder tables={tables} refetch={refetch}/>
           </Dialog>
         </div>
       </div>
