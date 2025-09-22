@@ -30,6 +30,8 @@ import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
 import { signOut } from "@/actions/auth-actions";
 import { useAuthStore } from "@/stores/auth-store";
+import Image from "next/image";
+import LogoDakries from '../../assets/images/logo-dakries-cafe.png'
 
 export default function AppSidebar() {
   const { isMobile } = useSidebar();
@@ -42,8 +44,9 @@ export default function AppSidebar() {
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
               <div className="font-semibold">
-                <div className="bg-cyan-500 flex p-2 items-center justify-center rounded-md">
-                  <ChefHat className="size-4 text-white" />
+                <div className="w-8 h-8 bg-gradient-to-br from-cyan-500 to-cyan-600 rounded-lg flex items-center justify-center shadow-lg border border-cyan-500/20 relative overflow-hidden backdrop-blur-sm">
+                  <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent" />
+                  <Image src={LogoDakries} alt="Logo" width={40} height={40} />
                 </div>
                 Dakries Café & Resto
               </div>
