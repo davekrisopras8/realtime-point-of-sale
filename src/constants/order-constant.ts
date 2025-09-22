@@ -52,14 +52,6 @@ export const FILTER_MENU = [
     label: "Appetizers",
   },
   {
-    value: "Soups",
-    label: "Soups",
-  },
-  {
-    value: "Salads",
-    label: "Salads",
-  },
-  {
     value: "Main Course",
     label: "Main Course",
   },
