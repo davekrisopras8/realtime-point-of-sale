@@ -30,13 +30,20 @@ import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
 import { signOut } from "@/actions/auth-actions";
 import { useAuthStore } from "@/stores/auth-store";
+import { useState, useEffect } from "react";
 import Image from "next/image";
-import LogoDakries from '../../assets/images/logo-dakries-cafe.png'
+import LogoDakries from "../../assets/images/logo-dakries-cafe.png";
 
 export default function AppSidebar() {
-  const { isMobile } = useSidebar();
+  const { isMobile, open } = useSidebar();
   const pathname = usePathname();
   const profile = useAuthStore((state) => state.profile);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader>
@@ -44,11 +51,30 @@ export default function AppSidebar() {
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
               <div className="font-semibold">
-                <div className="w-8 h-8 bg-gradient-to-br from-cyan-500 to-cyan-600 rounded-lg flex items-center justify-center shadow-lg border border-cyan-500/20 relative overflow-hidden backdrop-blur-sm">
-                  <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent" />
-                  <Image src={LogoDakries} alt="Logo" width={40} height={40} />
+                <div className="group-data-[collapsible=icon]:flex group-data-[collapsible=icon]:justify-center">
+                  <div className="w-8 h-8 bg-gradient-to-br from-cyan-500 to-cyan-600 rounded-lg flex items-center justify-center shadow-lg border border-cyan-500/20 relative overflow-hidden">
+                    <Image
+                      src={LogoDakries}
+                      alt="Logo"
+                      width={40}
+                      height={40}
+                    />
+                  </div>
                 </div>
-                Dakries Café & Resto
+                {mounted && (
+                  <span
+                    className={cn(
+                      "transition-all duration-200",
+                      !open && "opacity-0 w-0 overflow-hidden",
+                      open && "opacity-100"
+                    )}
+                  >
+                    Dakries Café & Resto
+                  </span>
+                )}
+                {!mounted && (
+                  <span className="opacity-100">Dakries Café & Resto</span>
+                )}
               </div>
             </SidebarMenuButton>
           </SidebarMenuItem>
