@@ -122,7 +122,7 @@ export default function DetailOrder({ id }: { id: string }) {
             "bg-gray-500": item.status === "Pending",
             "bg-yellow-500": item.status === "Process",
             "bg-blue-500": item.status === "Ready",
-            "bg-green-500": item.status === "Served",
+            "bg-green-500": item.status === "Completed",
           })}
         >
           {item.status}
@@ -134,7 +134,7 @@ export default function DetailOrder({ id }: { id: string }) {
               className={cn(
                 "data-[state=open]:bg-muted text-muted-foreground flex size-8",
                 {
-                  hidden: item.status === "Served",
+                  hidden: item.status === "Completed",
                 }
               )}
               size="icon"
@@ -143,8 +143,8 @@ export default function DetailOrder({ id }: { id: string }) {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-40">
-            {["Pending", "Process", "Served"].map((status, index) => {
-              const nextStatus = ["Process", "Ready", "Served"][index];
+            {["Pending", "Process", "Ready"].map((status, index) => {
+              const nextStatus = ["Process", "Ready", "Completed"][index];
               return (
                 item.status === status && (
                   <DropdownMenuItem
