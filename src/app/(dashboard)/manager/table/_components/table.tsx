@@ -42,9 +42,16 @@ export default function TableManagement() {
         .order("created_at");
 
       if (currentSearch) {
-        query.or(
-          `name.ilike.%${currentSearch}%,capacity.ilike.%${currentSearch}%,status.ilike.%${currentSearch}%`
-        );
+        const searchConditions = [
+          `name.ilike.%${currentSearch}%`,
+          `status.ilike.%${currentSearch}%`,
+        ];
+
+        if (!isNaN(Number(currentSearch))) {
+          searchConditions.push(`capacity.eq.${Number(currentSearch)}`);
+        }
+
+        query.or(searchConditions.join(","));
       }
 
       const result = await query;
