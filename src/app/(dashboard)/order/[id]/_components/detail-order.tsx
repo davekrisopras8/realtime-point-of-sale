@@ -1,17 +1,26 @@
-'use client';
+"use client";
 
-import DataTable from '@/components/common/data-table';
-import { Button } from '@/components/ui/button';
-import { HEADER_TABLE_DETAIL_ORDER } from '@/constants/order-constant';
-import useDataTable from '@/hooks/use-data-table';
-import { createClient } from '@/lib/supabase/client';
-import { cn, convertIDR } from '@/lib/utils';
-import { useQuery } from '@tanstack/react-query';
-import Image from 'next/image';
-import Link from 'next/link';
-import { useMemo } from 'react';
-import { toast } from 'sonner';
-import Summary from './summary';
+import DataTable from "@/components/common/data-table";
+import { Button } from "@/components/ui/button";
+import { HEADER_TABLE_DETAIL_ORDER } from "@/constants/order-constant";
+import useDataTable from "@/hooks/use-data-table";
+import { createClient } from "@/lib/supabase/client";
+import { cn, convertIDR } from "@/lib/utils";
+import { useQuery } from "@tanstack/react-query";
+import Image from "next/image";
+import Link from "next/link";
+import { startTransition, useActionState, useEffect, useMemo } from "react";
+import { toast } from "sonner";
+import Summary from "./summary";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { EllipsisVertical } from "lucide-react";
+import { INITIAL_STATE_ACTION } from "@/constants/general-constant";
+import { updateStatusOrderItem } from "../../actions";
 
 export default function DetailOrder({ id }: { id: string }) {
   const supabase = createClient();
@@ -19,16 +28,16 @@ export default function DetailOrder({ id }: { id: string }) {
     useDataTable();
 
   const { data: order } = useQuery({
-    queryKey: ['order', id],
+    queryKey: ["order", id],
     queryFn: async () => {
       const result = await supabase
-        .from('orders')
-        .select('id, customer_name, status, payment_url, tables (name, id)')
-        .eq('order_id', id)
+        .from("orders")
+        .select("id, customer_name, status, payment_url, tables (name, id)")
+        .eq("order_id", id)
         .single();
 
       if (result.error)
-        toast.error('Get Order data failed', {
+        toast.error("Get Order data failed", {
           description: result.error.message,
         });
 
@@ -37,17 +46,17 @@ export default function DetailOrder({ id }: { id: string }) {
     enabled: !!id,
   });
 
-  const { data: orderMenu, isLoading: isLoadingOrderMenu } = useQuery({
-    queryKey: ['orders_menu', order?.id, currentPage, currentLimit],
+  const { data: orderMenu, isLoading: isLoadingOrderMenu, refetch: refetchOrderMenu } = useQuery({
+    queryKey: ["orders_menu", order?.id, currentPage, currentLimit],
     queryFn: async () => {
       const result = await supabase
-        .from('orders_menus')
-        .select('*, menus (id, name, image_url, price)', { count: 'exact' })
-        .eq('order_id', order?.id)
-        .order('status');
+        .from("orders_menus")
+        .select("*, menus (id, name, image_url, price)", { count: "exact" })
+        .eq("order_id", order?.id)
+        .order("status");
 
       if (result.error)
-        toast.error('Get order menu data failed', {
+        toast.error("Get order menu data failed", {
           description: result.error.message,
         });
 
@@ -55,6 +64,38 @@ export default function DetailOrder({ id }: { id: string }) {
     },
     enabled: !!order?.id,
   });
+
+  const [updateStatusOrderState, updateStatusOrderAction] = useActionState(
+    updateStatusOrderItem,
+    INITIAL_STATE_ACTION
+  );
+
+  const handleUpdateStatusOrder = async (data: {
+    id: string;
+    status: string;
+  }) => {
+    const formData = new FormData();
+    Object.entries(data).forEach(([Key, value]) => {
+      formData.append(Key, value);
+    });
+
+    startTransition(() => {
+      updateStatusOrderAction(formData);
+    });
+  };
+
+  useEffect(() => {
+    if (updateStatusOrderState?.status === "error") {
+      toast.error("Update Status Order Failed", {
+        description: updateStatusOrderState.errors?._form?.[0],
+      });
+    }
+
+    if (updateStatusOrderState?.status === "success") {
+      toast.success("Update Status Order Success");
+      refetchOrderMenu();
+    }
+  }, [updateStatusOrderState]);
 
   const filteredData = useMemo(() => {
     return (orderMenu?.data || []).map((item, index) => {
@@ -71,22 +112,57 @@ export default function DetailOrder({ id }: { id: string }) {
           <div className="flex flex-col">
             {item.menus.name} x {item.quantity}
             <span className="text-xs text-muted-foreground">
-              {item.notes || 'No Notes'}
+              {item.notes || "No Notes"}
             </span>
           </div>
         </div>,
         <div>{convertIDR(item.menus.price * item.quantity)}</div>,
         <div
-          className={cn('px-2 py-1 rounded-full text-white w-fit capitalize', {
-            'bg-gray-500': item.status === 'pending',
-            'bg-yellow-500': item.status === 'process',
-            'bg-blue-500': item.status === 'ready',
-            'bg-green-500': item.status === 'serve',
+          className={cn("px-2 py-1 rounded-full text-white w-fit capitalize", {
+            "bg-gray-500": item.status === "Pending",
+            "bg-yellow-500": item.status === "Process",
+            "bg-blue-500": item.status === "Ready",
+            "bg-green-500": item.status === "Served",
           })}
         >
           {item.status}
         </div>,
-        '',
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              className={cn(
+                "data-[state=open]:bg-muted text-muted-foreground flex size-8",
+                {
+                  hidden: item.status === "Served",
+                }
+              )}
+              size="icon"
+            >
+              <EllipsisVertical />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-40">
+            {["Pending", "Process", "Served"].map((status, index) => {
+              const nextStatus = ["Process", "Ready", "Served"][index];
+              return (
+                item.status === status && (
+                  <DropdownMenuItem
+                    key={status}
+                    onClick={() =>
+                      handleUpdateStatusOrder({
+                        id: item.id,
+                        status: nextStatus,
+                      })
+                    }
+                  >
+                    {nextStatus}
+                  </DropdownMenuItem>
+                )
+              );
+            })}
+          </DropdownMenuContent>
+        </DropdownMenu>,
       ];
     });
   }, [orderMenu?.data]);
