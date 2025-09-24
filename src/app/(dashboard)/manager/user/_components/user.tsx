@@ -83,7 +83,7 @@ export default function UserManagement() {
           <span>{user.name}</span>
         </div>,
 
-        user.role,
+        <p className="capitalize">{user.role}</p>,
         <DropdownAction
           menu={[
             {
