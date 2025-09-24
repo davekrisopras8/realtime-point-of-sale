@@ -51,15 +51,15 @@ export const INITIAL_STATE_UPDATE_USER = {
 
 export const ROLE_LIST = [
   {
-    value: "Manager",
+    value: "manager",
     label: "Manager",
   },
   {
-    value: "Kitchen",
+    value: "kitchen",
     label: "Kitchen",
   },
   {
-    value: "Cashier",
+    value: "cashier",
     label: "Cashier",
   },
 ];

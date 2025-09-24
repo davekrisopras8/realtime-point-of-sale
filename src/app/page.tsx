@@ -59,7 +59,7 @@ export default function Home() {
           </div>
 
           {/* Cyan CTA Button */}
-          <Link href={profile.role === 'Manager' ? '/manager' : '/order' } className="block">
+          <Link href={profile.role === 'manager' ? '/manager' : '/order' } className="block">
             <Button className="w-full bg-cyan-500 hover:bg-cyan-400 text-white border border-cyan-500/30 hover:border-cyan-400/50 transition-all duration-300 text-sm py-5 rounded-lg group shadow-lg hover:shadow-cyan-500/20 hover:shadow-xl font-normal tracking-wide relative overflow-hidden">
               {/* Button shine effect on hover */}
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%]" />
