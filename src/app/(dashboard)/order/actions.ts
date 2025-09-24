@@ -170,7 +170,7 @@ export async function generatePayment(
   formData: FormData
 ) {
   const supabase = await createClient();
-  const orderId = formData.get("order_id");
+  const orderId = formData.get("id");
   const grossAmount = formData.get("gross_amount");
   const customerName = formData.get("customer_name");
 
