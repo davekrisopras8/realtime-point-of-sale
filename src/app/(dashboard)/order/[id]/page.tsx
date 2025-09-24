@@ -7,6 +7,12 @@ export const metadata: Metadata = {
   title: "Dakries Café & Resto | Detail Order",
 };
 
+declare global {
+  interface Window {
+    snap: any;
+  }
+}
+
 export default async function DetailOrderPage({
   params,
 }: {
