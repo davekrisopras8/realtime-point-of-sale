@@ -29,7 +29,7 @@ export default function FormTable<T extends FieldValues>({
   return (
     <DialogContent className="sm:max-w-[425px] max-h-[90vh]">
       <Form {...form}>
-        <DialogHeader>
+        <DialogHeader className='flex justify-center items-center'>
           <DialogTitle>{type} Table</DialogTitle>
           <DialogDescription>
             {type === 'Create' ? 'Add a new table' : 'Make changes table here'}

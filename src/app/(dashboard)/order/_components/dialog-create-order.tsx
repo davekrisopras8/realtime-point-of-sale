@@ -65,8 +65,8 @@ export default function DialogCreateOrder({
   return (
     <DialogContent className="sm:max-w-[425px] max-h-[90vh]">
       <Form {...form}>
-        <DialogHeader>
-          <DialogTitle>createOrder</DialogTitle>
+        <DialogHeader className="flex items-center justify-center">
+          <DialogTitle>Create Order</DialogTitle>
           <DialogDescription>Add a new order from customer</DialogDescription>
         </DialogHeader>
         <form onSubmit={onSubmit} className="space-y-4">
