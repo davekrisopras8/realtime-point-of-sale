@@ -1,27 +1,38 @@
-'use client';
+"use client";
 
-import { Button } from '@/components/ui/button';
-import { createClient } from '@/lib/supabase/client';
-import { useMutation } from '@tanstack/react-query';
-import { CheckCircle } from 'lucide-react';
-import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
-import { useEffect } from 'react';
+import { Button } from "@/components/ui/button";
+import { createClient } from "@/lib/supabase/client";
+import { useMutation } from "@tanstack/react-query";
+import { CheckCircle } from "lucide-react";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { useEffect } from "react";
 
 export default function Success() {
   const supabase = createClient();
   const seacrhParams = useSearchParams();
-  const order_id = seacrhParams.get('order_id');
+  const order_id = seacrhParams.get("order_id");
 
   const { mutate } = useMutation({
-    mutationKey: ['mutateUpdateStatusOrder'],
+    mutationKey: ["mutateUpdateStatusOrder"],
     mutationFn: async () => {
-      await supabase
-        .from('orders')
+      const { data } = await supabase
+        .from("orders")
         .update({
-          status: 'Settled',
+          status: "Settled",
         })
-        .eq('order_id', order_id);
+        .eq("order_id", order_id)
+        .select()
+        .single();
+
+      if (data) {
+        await supabase
+          .from("tables")
+          .update({
+            status: "Available",
+          })
+          .eq("id", data.table_id);
+      }
     },
   });
 

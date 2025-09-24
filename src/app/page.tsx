@@ -1,47 +1,16 @@
+"use client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ChefHat, ArrowRight } from "lucide-react";
+import {ArrowRight } from "lucide-react";
 import Link from "next/link";
-import LogoDakries from '../assets/images/logo-dakries-cafe.png'
-import { createClient } from "@/lib/supabase/server";
-import { redirect } from "next/navigation";
+import LogoDakries from "../assets/images/logo-dakries-cafe.png";
+
 import Image from "next/image";
+import { useAuthStore } from "@/stores/auth-store";
 
-async function getCurrentUser() {
-  const supabase = await createClient();
+export default function Home() {
 
-  const {
-    data: { user: authUser },
-    error: authError,
-  } = await supabase.auth.getUser();
-
-  if (authError || !authUser) {
-    redirect("/login");
-  }
-
-  const { data: profile, error: profileError } = await supabase
-    .from("profiles")
-    .select("id, name, role, avatar_url")
-    .eq("id", authUser.id)
-    .single();
-
-  if (profileError) {
-    console.error("Error fetching profile:", profileError);
-    return {
-      id: authUser.id,
-      name:
-        authUser.user_metadata?.name ||
-        authUser.email?.split("@")[0] ||
-        "Guest User",
-      role: authUser.user_metadata?.role,
-    };
-  }
-
-  return profile;
-}
-
-export default async function Home() {
-  const user = await getCurrentUser();
+  const profile = useAuthStore((state) => state.profile);
 
   return (
     <div className="min-h-screen bg-neutral-950 flex items-center justify-center p-4 relative overflow-hidden">
@@ -62,7 +31,7 @@ export default async function Home() {
           <div className="mx-auto mb-8 relative">
             <div className="w-16 h-16 bg-gradient-to-br from-cyan-500 to-cyan-600 rounded-xl flex items-center justify-center shadow-lg border border-cyan-500/20 relative overflow-hidden backdrop-blur-sm">
               <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent" />
-              <Image src={LogoDakries} alt="Logo" width={80} height={80}/>
+              <Image src={LogoDakries} alt="Logo" width={80} height={80} />
             </div>
             {/* Cyan glow effect */}
             <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/20 to-cyan-600/20 rounded-xl blur-xl scale-125 -z-10" />
@@ -83,12 +52,14 @@ export default async function Home() {
         <CardContent className="text-center space-y-6 pb-10 px-8">
           {/* User greeting with clean white text */}
           <div className="space-y-1">
-            <p className="text-neutral-400 text-medium font-normal tracking-wide">Welcome back,</p>
-            <p className="text-2xl font-medium text-white">{user.name}</p>
+            <p className="text-neutral-400 text-medium font-normal tracking-wide">
+              Welcome back,
+            </p>
+            <p className="text-2xl font-medium text-white">{profile.name}</p>
           </div>
 
           {/* Cyan CTA Button */}
-          <Link href="/manager" className="block">
+          <Link href={profile.role === 'Manager' ? '/manager' : '/order' } className="block">
             <Button className="w-full bg-cyan-500 hover:bg-cyan-400 text-white border border-cyan-500/30 hover:border-cyan-400/50 transition-all duration-300 text-sm py-5 rounded-lg group shadow-lg hover:shadow-cyan-500/20 hover:shadow-xl font-normal tracking-wide relative overflow-hidden">
               {/* Button shine effect on hover */}
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%]" />
