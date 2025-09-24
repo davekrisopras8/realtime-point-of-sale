@@ -103,7 +103,7 @@ export default function Summary({
             <p className="text-lg font-semibold">Total</p>
             <p className="text-lg font-semibold">{convertIDR(grandTotal)}</p>
           </div>
-          {order?.status === "Process" && profile.role !== 'Kitchen' && (
+          {order?.status === "Process" && profile.role !== 'kitchen' && (
             <Button
               type="submit"
               onClick={handleGeneratePayment}
