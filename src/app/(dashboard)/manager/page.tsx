@@ -1,9 +1,10 @@
-import { Button } from "@/components/ui/button";
+import { Metadata } from "next";
+import Dashboard from "./_components/dashboard";
 
-export default function ManagerDashboardPage() {
-  return (
-    <div>
-      Dashboard
-    </div>
-  )
+export const metadata: Metadata = {
+  title: "Dakries Café & Resto | Dashboard",
+};
+
+export default function MenuManagementPage() {
+  return <Dashboard />;
 }
