@@ -23,11 +23,7 @@ export default function Summary({
     status: string;
   };
   orderMenu:
-    | {
-        menus: Menu;
-        quantity: number;
-        status: string;
-      }[]
+    | { menus: Menu; quantity: number; status: string }[]
     | null
     | undefined;
   id: string;
@@ -49,7 +45,6 @@ export default function Summary({
     formData.append("id", id || "");
     formData.append("gross_amount", grandTotal.toString());
     formData.append("customer_name", order?.customer_name || "");
-
     startTransition(() => {
       generatePaymentAction(formData);
     });
@@ -66,11 +61,10 @@ export default function Summary({
       window.snap.pay(generatePaymentState.data.payment_token);
     }
   }, [generatePaymentState]);
-
   return (
     <Card className="w-full shadow-sm">
       <CardContent className="space-y-4">
-        <h3 className="text-lg font-semibold"> Customer Information</h3>
+        <h3 className="text-lg font-semibold">Customer Information</h3>
         {order && (
           <div className="space-y-4">
             <div className="space-y-2">
@@ -108,10 +102,10 @@ export default function Summary({
           </div>
           {order?.status === "Process" && (
             <Button
-              className="w-full font-semibold bg-cyan-500 hover:by-cyan-600 text-white cursor-pointer"
               type="submit"
               onClick={handleGeneratePayment}
               disabled={!isAllCompleted || isPendingGeneratePayment}
+              className="w-full font-semibold bg-teal-500 hover:bg-teal-600 text-white cursor-pointer"
             >
               {isPendingGeneratePayment ? (
                 <Loader2 className="animate-spin" />

@@ -51,7 +51,7 @@ export default function FormSelect<T extends FieldValues>({
                   <SelectLabel>{label}</SelectLabel>
                   {selectItem.map((item) => (
                     <SelectItem
-                      key={item.label}
+                      key={item.value}
                       value={item.value}
                       disabled={item.disabled}
                       className="capitalize"

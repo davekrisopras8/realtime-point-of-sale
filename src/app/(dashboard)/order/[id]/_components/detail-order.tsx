@@ -19,8 +19,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { EllipsisVertical } from "lucide-react";
-import { INITIAL_STATE_ACTION } from "@/constants/general-constant";
 import { updateStatusOrderItem } from "../../actions";
+import { INITIAL_STATE_ACTION } from "@/constants/general-constant";
 
 export default function DetailOrder({ id }: { id: string }) {
   const supabase = createClient();
@@ -46,7 +46,11 @@ export default function DetailOrder({ id }: { id: string }) {
     enabled: !!id,
   });
 
-  const { data: orderMenu, isLoading: isLoadingOrderMenu, refetch: refetchOrderMenu } = useQuery({
+  const {
+    data: orderMenu,
+    isLoading: isLoadingOrderMenu,
+    refetch: refetchOrderMenu,
+  } = useQuery({
     queryKey: ["orders_menu", order?.id, currentPage, currentLimit],
     queryFn: async () => {
       const result = await supabase
@@ -133,9 +137,7 @@ export default function DetailOrder({ id }: { id: string }) {
               variant="ghost"
               className={cn(
                 "data-[state=open]:bg-muted text-muted-foreground flex size-8",
-                {
-                  hidden: item.status === "Completed",
-                }
+                { hidden: item.status === "Completed" }
               )}
               size="icon"
             >

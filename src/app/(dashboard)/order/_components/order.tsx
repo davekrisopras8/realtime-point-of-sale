@@ -19,9 +19,7 @@ import {
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { Table } from "@/validations/table-validation";
-import {
-  HEADER_TABLE_ORDER,
-} from "@/constants/order-constant";
+import { HEADER_TABLE_ORDER } from "@/constants/order-constant";
 import DialogCreateOrder from "./dialog-create-order";
 import { updateReservation } from "../actions";
 import { INITIAL_STATE_ACTION } from "@/constants/general-constant";
@@ -37,6 +35,7 @@ export default function OrderManagement() {
     handleChangeLimit,
     handleChangeSearch,
   } = useDataTable();
+
   const {
     data: orders,
     isLoading,
@@ -115,11 +114,9 @@ export default function OrderManagement() {
     status: string;
   }) => {
     const formData = new FormData();
-
     Object.entries({ id, table_id, status }).forEach(([Key, value]) => {
       formData.append(Key, value);
     });
-
     startTransition(() => {
       reservedAction(formData);
     });
@@ -135,7 +132,6 @@ export default function OrderManagement() {
     if (reservedState?.status === "success") {
       toast.success("Update Reservation Success");
       refetch();
-      refetchTables();
     }
   }, [reservedState]);
 

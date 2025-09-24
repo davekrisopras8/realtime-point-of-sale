@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import AddOrderItem from "./_components/add-order-item";
 
 export const metadata: Metadata = {
-  title: "Dakries Café & Resto | Detail Order",
+  title: "Dakries Café & Resto | Add Order Item",
 };
 
 export default async function AddOrderItemPage({

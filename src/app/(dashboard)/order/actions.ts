@@ -1,4 +1,5 @@
 "use server";
+
 import { createClient } from "@/lib/supabase/server";
 import { FormState } from "@/types/general";
 import { Cart, OrderFormState } from "@/types/order";
@@ -125,7 +126,6 @@ export async function addOrderItem(
   const payload = data.items.map(({ total, menu, ...item }) => item);
 
   const { error } = await supabase.from("orders_menus").insert(payload);
-
   if (error) {
     return {
       status: "error",
@@ -147,7 +147,9 @@ export async function updateStatusOrderItem(
 
   const { error } = await supabase
     .from("orders_menus")
-    .update({ status: formData.get("status") })
+    .update({
+      status: formData.get("status"),
+    })
     .eq("id", formData.get("id"));
 
   if (error) {
@@ -178,7 +180,6 @@ export async function generatePayment(
     isProduction: false,
     serverKey: environment.MIDTRANS_SERVER_KEY!,
   });
-
   const parameter = {
     transaction_details: {
       order_id: `${orderId}`,

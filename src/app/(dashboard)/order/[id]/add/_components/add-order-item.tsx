@@ -10,8 +10,8 @@ import { toast } from "sonner";
 import CardMenu from "./card-menu";
 import LoadingCardMenu from "./loading-card-menu";
 import CartSection from "./cart";
-import { Cart } from "@/types/order";
 import { startTransition, useActionState, useState } from "react";
+import { Cart } from "@/types/order";
 import { Menu } from "@/validations/menu-validation";
 import { addOrderItem } from "../../../actions";
 import { INITIAL_STATE_ACTION } from "@/constants/general-constant";
@@ -72,8 +72,7 @@ export default function AddOrderItem({ id }: { id: string }) {
   const [carts, setCarts] = useState<Cart[]>([]);
 
   const handleAddToCart = (menu: Menu, action: "increment" | "decrement") => {
-    const existingItem = carts.find((item) => item.menu_id == menu.id);
-
+    const existingItem = carts.find((item) => item.menu_id === menu.id);
     if (existingItem) {
       if (action === "decrement") {
         if (existingItem.quantity > 1) {
@@ -112,7 +111,7 @@ export default function AddOrderItem({ id }: { id: string }) {
     }
   };
 
-  const [addOrderItemState, AddOrderItemAction, isPendingAddOrderItem] =
+  const [addOrderItemState, addOrderItemAction, isPendingAddOrderItem] =
     useActionState(addOrderItem, INITIAL_STATE_ACTION);
 
   const handleOrder = async () => {
@@ -126,7 +125,7 @@ export default function AddOrderItem({ id }: { id: string }) {
     };
 
     startTransition(() => {
-      AddOrderItemAction(data);
+      addOrderItemAction(data);
     });
   };
 

@@ -26,7 +26,7 @@ export default async function DetailOrderPage({
         data-client-key={environment.MIDTRANS_CLIENT_KEY}
         strategy="lazyOnload"
       />
-      <DetailOrder id={id} />;
+      <DetailOrder id={id} />
     </div>
   );
 }
