@@ -62,9 +62,26 @@ export const FILTER_MENU = [
     label: "Desserts",
   },
   {
+    value: "Salads",
+    label: "Salads",
+  },
+  {
+    value: "Soups",
+    label: "Soups",
+  },
+  {
+    value: "Sandwiches",
+    label: "Sandwiches",
+  },
+  {
     value: "Beverages",
     label: "Beverages",
   },
+  {
+    value: "Seafood",
+    label: "Seafood",
+  },
+  
 ];
 
 export const INITIAL_STATE_GENERATE_PAYMENT = {

@@ -132,25 +132,28 @@ export default function AddOrderItem({ id }: { id: string }) {
   return (
     <div className="flex flex-col lg:flex-row gap-4 w-full">
       <div className="space-y-4 lg:w-2/3">
-        <div className="flex flex-col items-center justify-between gap-4 w-full lg:flex-row">
-          <div className="flex flex-col lg:flex-row items-center gap-4">
+        <div className="space-y-4">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 w-full">
             <h1 className="text-2xl font-bold">Menu</h1>
-            <div className="flex gap-2">
-              {FILTER_MENU.map((item) => (
-                <Button
-                  key={item.value}
-                  onClick={() => handleChangeFilter(item.value)}
-                  variant={currentFilter === item.value ? "default" : "outline"}
-                >
-                  {item.label}
-                </Button>
-              ))}
-            </div>
+            <Input
+              placeholder="Search..."
+              onChange={(e) => handleChangeSearch(e.target.value)}
+              className="w-full lg:min-w-[250px]"
+            />
           </div>
-          <Input
-            placeholder="Search..."
-            onChange={(e) => handleChangeSearch(e.target.value)}
-          />
+          <div className="flex flex-wrap gap-2">
+            {FILTER_MENU.map((item) => (
+              <Button
+                key={item.value}
+                onClick={() => handleChangeFilter(item.value)}
+                variant={currentFilter === item.value ? "default" : "outline"}
+                size="sm"
+                className="flex-shrink-0"
+              >
+                {item.label}
+              </Button>
+            ))}
+          </div>
         </div>
         {isLoadingMenu && !menus ? (
           <LoadingCardMenu />
