@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Label, Pie, PieChart, Sector } from "recharts";
 import { PieSectorDataItem } from "recharts/types/polar/Pie";
 import {
@@ -69,9 +69,14 @@ export default function PieChartComponent({
     });
   }, [data]);
 
-  const [activeCategory, setActiveCategory] = useState(
-    chartData.length > 0 ? chartData[0].category : ""
-  );
+  const [activeCategory, setActiveCategory] = useState("");
+
+  // Update activeCategory when chartData changes
+  useEffect(() => {
+    if (chartData.length > 0 && !activeCategory) {
+      setActiveCategory(chartData[0].category);
+    }
+  }, [chartData, activeCategory]);
 
   const activeIndex = useMemo(
     () => chartData.findIndex((item) => item.category === activeCategory),
@@ -83,10 +88,20 @@ export default function PieChartComponent({
     [chartData]
   );
 
+  // Early return if no data
   if (!data || data.length === 0) {
     return (
       <div className="w-full h-full flex items-center justify-center text-muted-foreground">
         No data available
+      </div>
+    );
+  }
+
+  // Don't render chart until activeCategory is set
+  if (!activeCategory || activeIndex === -1) {
+    return (
+      <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+        Loading...
       </div>
     );
   }
