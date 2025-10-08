@@ -1,6 +1,6 @@
 "use client";
 
-import Charts from "@/components/common/charts";
+import LineCharts from "@/components/common/charts";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -54,12 +54,12 @@ export default function Dashboard() {
     queryFn: async () => {
       const { data: dataThisMonth } = await supabase
         .from("orders_menus")
-        .select("quantity, menus(price), created_at")
+        .select("quantity, menus (price), created_at")
         .gte("created_at", thisMonth);
 
       const { data: dataLastMonth } = await supabase
         .from("orders_menus")
-        .select("quantity, menus(price), created_at")
+        .select("quantity, menus (price), created_at")
         .gte("created_at", lastMonth)
         .lt("created_at", thisMonth);
 
@@ -85,13 +85,11 @@ export default function Dashboard() {
         100
       ).toFixed(2);
 
-      const uniqueDays = new Set(
+      const daysInData = new Set(
         (dataThisMonth ?? []).map((item) =>
           new Date(item.created_at).toISOString().slice(0, 10)
         )
-      );
-
-      const daysInData = uniqueDays.size;
+      ).size;
 
       const averageRevenueThisMonth =
         daysInData > 0 ? totalRevenueThisMonth / daysInData : 0;
@@ -123,7 +121,7 @@ export default function Dashboard() {
     queryFn: async () => {
       const { data } = await supabase
         .from("orders")
-        .select("id,order_id, customer_name, status, tables(name, id)")
+        .select("id, order_id, customer_name, status, tables(name, id)")
         .eq("status", "process")
         .limit(5)
         .order("created_at", { ascending: false });
@@ -201,7 +199,7 @@ export default function Dashboard() {
             </CardDescription>
           </CardHeader>
           <div className="w-full h-64 p-6">
-            <Charts data={orders} />
+            <LineCharts data={orders} />
           </div>
         </Card>
         <Card className="w-full lg:w-1/3">
