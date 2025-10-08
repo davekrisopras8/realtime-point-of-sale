@@ -1,6 +1,6 @@
 "use client";
 
-import LineCharts from "@/components/common/charts";
+import BarChartComponent from "@/components/common/chart";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -26,7 +26,7 @@ export default function Dashboard() {
       const { data } = await supabase
         .from("orders")
         .select("created_at")
-        .eq("status", "settled")
+        .eq("status", "Settled")
         .gte("created_at", lastWeek.toISOString())
         .order("created_at");
 
@@ -52,17 +52,28 @@ export default function Dashboard() {
   const { data: revenue } = useQuery({
     queryKey: ["revenue-this-month"],
     queryFn: async () => {
+      // Calculate date ranges correctly
+      const now = new Date();
+      const thisMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+      const twoMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 2, 1);
+
+      // Get this month's data with settled orders only
       const { data: dataThisMonth } = await supabase
         .from("orders_menus")
-        .select("quantity, menus (price), created_at")
-        .gte("created_at", thisMonth);
+        .select("quantity, menus (price), orders!inner(status, created_at)")
+        .eq("orders.status", "Settled")
+        .gte("orders.created_at", thisMonth.toISOString());
 
+      // Get last month's data with settled orders only
       const { data: dataLastMonth } = await supabase
         .from("orders_menus")
-        .select("quantity, menus (price), created_at")
-        .gte("created_at", lastMonth)
-        .lt("created_at", thisMonth);
+        .select("quantity, menus (price), orders!inner(status, created_at)")
+        .eq("orders.status", "Settled")
+        .gte("orders.created_at", lastMonth.toISOString())
+        .lt("orders.created_at", thisMonth.toISOString());
 
+      // Calculate total revenue this month
       const totalRevenueThisMonth = (dataThisMonth ?? []).reduce(
         (sum, item) => {
           const price = (item.menus as unknown as { price: number }).price;
@@ -71,6 +82,7 @@ export default function Dashboard() {
         0
       );
 
+      // Calculate total revenue last month
       const totalRevenueLastMonth = (dataLastMonth ?? []).reduce(
         (sum, item) => {
           const price = (item.menus as unknown as { price: number }).price;
@@ -79,18 +91,27 @@ export default function Dashboard() {
         0
       );
 
-      const growthRate = (
-        ((totalRevenueThisMonth - totalRevenueLastMonth) /
-          totalRevenueLastMonth) *
-        100
-      ).toFixed(2);
+      // Calculate growth rate with safety check
+      let growthRate = "0.00";
+      if (totalRevenueLastMonth > 0) {
+        growthRate = (
+          ((totalRevenueThisMonth - totalRevenueLastMonth) /
+            totalRevenueLastMonth) *
+          100
+        ).toFixed(2);
+      } else if (totalRevenueThisMonth > 0) {
+        growthRate = "100.00";
+      }
 
+      // Calculate unique days with orders this month
       const daysInData = new Set(
-        (dataThisMonth ?? []).map((item) =>
-          new Date(item.created_at).toISOString().slice(0, 10)
-        )
+        (dataThisMonth ?? []).map((item) => {
+          const orderData = item.orders as unknown as { created_at: string };
+          return new Date(orderData.created_at).toISOString().slice(0, 10);
+        })
       ).size;
 
+      // Calculate average revenue per day
       const averageRevenueThisMonth =
         daysInData > 0 ? totalRevenueThisMonth / daysInData : 0;
 
@@ -109,7 +130,7 @@ export default function Dashboard() {
       const { count } = await supabase
         .from("orders")
         .select("id", { count: "exact" })
-        .eq("status", "settled")
+        .eq("status", "Settled")
         .gte("created_at", thisMonth);
 
       return count;
@@ -122,7 +143,7 @@ export default function Dashboard() {
       const { data } = await supabase
         .from("orders")
         .select("id, order_id, customer_name, status, tables(name, id)")
-        .eq("status", "process")
+        .eq("status", "Process")
         .limit(5)
         .order("created_at", { ascending: false });
 
@@ -199,7 +220,7 @@ export default function Dashboard() {
             </CardDescription>
           </CardHeader>
           <div className="w-full h-64 p-6">
-            <LineCharts data={orders} />
+            <BarChartComponent data={orders} />
           </div>
         </Card>
         <Card className="w-full lg:w-1/3">
