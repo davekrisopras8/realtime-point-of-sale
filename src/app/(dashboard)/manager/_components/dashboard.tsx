@@ -1,6 +1,7 @@
 "use client";
 
-import BarChartComponent from "@/components/common/chart";
+import BarChartComponent from "@/components/common/bar-chart";
+import PieChartComponent from "@/components/common/pie-chart";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -137,6 +138,50 @@ export default function Dashboard() {
     },
   });
 
+  const { data: salesByCategory } = useQuery({
+    queryKey: ["sales-by-category"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("orders_menus")
+        .select(
+          "quantity, menus!inner (price, category), orders!inner(status, created_at)"
+        )
+        .eq("orders.status", "Settled")
+        .gte("orders.created_at", thisMonth);
+
+      if (error) {
+        console.error("Error fetching sales by category:", error);
+        return [];
+      }
+
+      if (!data || data.length === 0) {
+        return [];
+      }
+
+      const categorySales: Record<string, number> = {};
+
+      data.forEach((item) => {
+        const menu = item.menus as unknown as {
+          price: number;
+          category: string;
+        };
+
+        if (menu && menu.category) {
+          const categoryName = menu.category;
+          const revenue = Number(menu.price) * item.quantity;
+
+          categorySales[categoryName] =
+            (categorySales[categoryName] || 0) + revenue;
+        }
+      });
+
+      return Object.entries(categorySales).map(([category, sales]) => ({
+        category,
+        sales,
+      }));
+    },
+  });
+
   const { data: lastOrder } = useQuery({
     queryKey: ["last-order"],
     queryFn: async () => {
@@ -210,7 +255,7 @@ export default function Dashboard() {
           </CardFooter>
         </Card>
       </div>
-      <div className="flex flex-col lg:flex-row gap-4">
+      <div className="flex flex-col lg:flex-row gap-4 mb-4">
         <Card className="w-full lg:w-2/3">
           <CardHeader>
             <CardTitle>Order Create Per Week</CardTitle>
@@ -255,6 +300,70 @@ export default function Dashboard() {
             ) : (
               <p>No active orders</p>
             )}
+          </div>
+        </Card>
+      </div>
+      <div className="flex flex-col lg:flex-row gap-4">
+        <Card className="w-full lg:w-1/2">
+          <CardHeader>
+            <CardTitle>Sales by Menu Category</CardTitle>
+            <CardDescription>
+              Revenue distribution across menu categories this month
+            </CardDescription>
+          </CardHeader>
+          <div className="px-6 pb-6">
+            {salesByCategory && salesByCategory.length > 0 ? (
+              <div className="space-y-4">
+                {(() => {
+                  const totalSales = salesByCategory.reduce(
+                    (sum, item) => sum + item.sales,
+                    0
+                  );
+                  return salesByCategory.map((item, index) => {
+                    const percentage = ((item.sales / totalSales) * 100).toFixed(
+                      1
+                    );
+                    return (
+                      <div
+                        key={index}
+                        className="flex items-center justify-between p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div
+                            className="w-3 h-3 rounded-full bg-cyan-500"
+
+                          />
+                          <div>
+                            <p className="font-medium">{item.category}</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-bold text-lg">{percentage}%</p>
+                          <p className="text-xs text-muted-foreground">
+                            of Total
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  });
+                })()}
+              </div>
+            ) : (
+              <div className="flex items-center justify-center h-48 text-muted-foreground">
+                No data available
+              </div>
+            )}
+          </div>
+        </Card>
+        <Card className="w-full lg:w-1/2">
+          <CardHeader>
+            <CardTitle>Revenue Distribution</CardTitle>
+            <CardDescription>
+              Interactive view of sales by category
+            </CardDescription>
+          </CardHeader>
+          <div className="w-full px-6 pb-6">
+            <PieChartComponent data={salesByCategory} />
           </div>
         </Card>
       </div>

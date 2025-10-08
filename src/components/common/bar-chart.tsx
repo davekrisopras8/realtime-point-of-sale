@@ -9,7 +9,7 @@ import {
 const chartConfig = {
   total: {
     label: "Total",
-    color: "#00bba7",
+    color: "#06B6D4",
   },
 } satisfies ChartConfig;
 
