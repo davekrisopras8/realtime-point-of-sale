@@ -39,29 +39,38 @@ const Receipt = ({
         className="w-full flex flex-col p-8 absolute -z-10 top-0"
         ref={contentRef}
       >
-        <h4 className="text-2xl font-bold text-center pb-4 border-b border-dashed">
+        <h4 className="text-2xl font-bold text-center">
           Dakries Café & Resto
         </h4>
+        <p className="text-xs text-center mt-1">
+          Jl. Dave Krisopras Essanto, No. 1, Mojokerto
+        </p>
+        <p className="text-xs text-center mb-4">
+          Telp: (0813) 987-15412
+        </p>
+        <div className="border-b border-dashed"></div>
+
         <div className="py-4 border-b border-dashed text-sm space-y-2">
           <p>
-            Bill No: <span className="font-bold">{orderId}</span>{" "}
+            Bill No: <span className="font-bold">{orderId}</span>
+          </p>
+          <p>
+            Customer: <span className="font-bold">{order?.customer_name}</span>
           </p>
           <p>
             Table:{" "}
             <span className="font-bold">
               {(order?.tables as unknown as { name: string })?.name}
-            </span>{" "}
-          </p>
-          <p>
-            Customer: <span className="font-bold">{order?.customer_name}</span>{" "}
+            </span>
           </p>
           <p>
             Date:{" "}
             <span className="font-bold">
               {new Date(order?.created_at).toLocaleDateString()}
-            </span>{" "}
+            </span>
           </p>
         </div>
+
         <div className="flex flex-col gap-2 py-4 border-b border-dashed text-sm">
           {orderMenu?.map((item) => (
             <div className="flex justify-between items-center" key={item.id}>
@@ -72,7 +81,8 @@ const Receipt = ({
             </div>
           ))}
         </div>
-        <div className="flex flex-col gap-2 py-4 text-sm">
+
+        <div className="flex flex-col gap-2 py-4 border-b border-dashed text-sm">
           <div className="flex justify-between items-center">
             <p>Subtotal</p>
             <p>{convertIDR(totalPrice)}</p>
@@ -85,10 +95,11 @@ const Receipt = ({
             <p>Service</p>
             <p>{convertIDR(service)}</p>
           </div>
-          <div className="flex justify-between items-center">
-            <p>Total</p>
-            <p>{convertIDR(grandTotal)}</p>
-          </div>
+        </div>
+
+        <div className="flex justify-between items-center py-4 text-sm font-bold border-b border-dashed">
+          <p>Total</p>
+          <p>{convertIDR(grandTotal)}</p>
         </div>
       </div>
     </div>
