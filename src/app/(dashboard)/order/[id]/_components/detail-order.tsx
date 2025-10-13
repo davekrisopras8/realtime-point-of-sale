@@ -212,7 +212,7 @@ export default function DetailOrder({ id }: { id: string }) {
             <Button>Add Order Item</Button>
           </Link>
         )}
-        {order?.status === "Settled" && (
+        {profile.role !== "kitchen" && order?.status === "Settled" && (
           <Receipt order={order} orderMenu={orderMenu?.data} orderId={id} />
         )}
       </div>
