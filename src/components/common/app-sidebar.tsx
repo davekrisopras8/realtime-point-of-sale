@@ -35,12 +35,6 @@ import { cn } from "@/lib/utils";
 import { signOut } from "@/actions/auth-actions";
 import { useAuthStore } from "@/stores/auth-store";
 import LogoDakries from "../../assets/images/logo-dakries-cafe.png";
-
-const getInitials = (name?: string): string => {
-  if (!name) return "?";
-  return name.charAt(0).toUpperCase();
-};
-
 const getAvatarUrl = (url?: string | null): string | undefined => {
   if (!url || typeof url !== "string" || url.trim() === "") {
     return undefined;
@@ -67,7 +61,7 @@ export default function AppSidebar() {
   }, [reset]);
 
   const avatarUrl = getAvatarUrl(profile.avatar_url);
-  const initials = getInitials(profile.name);
+  const initials = profile.name?.charAt(0) || "?";
   const menuItems = SIDEBAR_MENU_LIST[profile.role as SidebarMenuKey] || [];
 
   return (
@@ -81,7 +75,7 @@ export default function AppSidebar() {
                   <div className="w-8 h-8 bg-gradient-to-br from-cyan-500 to-cyan-600 rounded-lg flex items-center justify-center shadow-lg border border-cyan-500/20 relative overflow-hidden">
                     <Image
                       src={LogoDakries}
-                      alt="Logo"
+                      alt="Dakries Café Logo"
                       width={40}
                       height={40}
                       priority
@@ -153,7 +147,7 @@ export default function AppSidebar() {
                   <Avatar className="h-8 w-8 shrink-0">
                     <AvatarImage
                       src={avatarUrl}
-                      alt={`${profile.name}'s avatar`}
+                      alt={profile.name}
                       className="object-cover"
                     />
                     <AvatarFallback className="text-base">
@@ -181,7 +175,7 @@ export default function AppSidebar() {
                     <Avatar className="h-8 w-8 shrink-0">
                       <AvatarImage
                         src={avatarUrl}
-                        alt={`${profile.name}'s avatar`}
+                        alt={profile.name}
                         className="h-full w-full object-cover"
                       />
                       <AvatarFallback className="rounded-full">
