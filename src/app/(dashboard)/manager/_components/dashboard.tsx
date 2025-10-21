@@ -17,9 +17,9 @@ import Link from "next/link";
 
 export default function Dashboard() {
   const supabase = createClient();
-  const lastWeek = new Date();
-  lastWeek.setDate(lastWeek.getDate() - 6);
-  lastWeek.setHours(0, 0, 0, 0);
+  const firstDayOfMonth = new Date();
+  firstDayOfMonth.setDate(1);
+  firstDayOfMonth.setHours(0, 0, 0, 0);
 
   const { data: orders } = useQuery({
     queryKey: ["orders-per-day"],
@@ -28,7 +28,7 @@ export default function Dashboard() {
         .from("orders")
         .select("created_at")
         .eq("status", "Settled")
-        .gte("created_at", lastWeek.toISOString())
+        .gte("created_at", firstDayOfMonth.toISOString())
         .order("created_at");
 
       const counts: Record<string, number> = {};
@@ -258,9 +258,9 @@ export default function Dashboard() {
       <div className="flex flex-col lg:flex-row gap-4 mb-4">
         <Card className="w-full lg:w-2/3">
           <CardHeader>
-            <CardTitle>Order Create Per Week</CardTitle>
+            <CardTitle>Order Create Per Month</CardTitle>
             <CardDescription>
-              Showing orders from {lastWeek.toLocaleDateString()} to{" "}
+              Showing orders from {firstDayOfMonth.toLocaleDateString()} to{" "}
               {new Date().toLocaleDateString()}
             </CardDescription>
           </CardHeader>
