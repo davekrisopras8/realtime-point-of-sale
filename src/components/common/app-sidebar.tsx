@@ -35,6 +35,7 @@ import { cn } from "@/lib/utils";
 import { signOut } from "@/actions/auth-actions";
 import { useAuthStore } from "@/stores/auth-store";
 import LogoDakries from "../../assets/images/logo-dakries-cafe.png";
+
 const getAvatarUrl = (url?: string | null): string | undefined => {
   if (!url || typeof url !== "string" || url.trim() === "") {
     return undefined;
@@ -150,7 +151,7 @@ export default function AppSidebar() {
                       alt={profile.name}
                       className="object-cover"
                     />
-                    <AvatarFallback className="text-base">
+                    <AvatarFallback className="text-base" suppressHydrationWarning>
                       {initials}
                     </AvatarFallback>
                   </Avatar>
@@ -178,7 +179,7 @@ export default function AppSidebar() {
                         alt={profile.name}
                         className="h-full w-full object-cover"
                       />
-                      <AvatarFallback className="rounded-full">
+                      <AvatarFallback className="rounded-full" suppressHydrationWarning>
                         {initials}
                       </AvatarFallback>
                     </Avatar>
