@@ -18,3 +18,35 @@ export async function signOut() {
   }
   redirect("/login");
 }
+
+export async function getCurrentProfile() {
+  const supabase = await createClient();
+  const cookiesStore = await cookies();
+
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+      return null;
+    }
+
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .single();
+
+    if (profile) {
+      cookiesStore.set("user_profile", JSON.stringify(profile), {
+        httpOnly: true,
+        sameSite: 'lax',
+        maxAge: 60 * 60 * 24 * 7 // 7 days
+      });
+    }
+
+    return profile;
+  } catch (error) {
+    console.error("Error getting current profile:", error);
+    return null;
+  }
+}
