@@ -3,7 +3,7 @@
 import { EllipsisVertical, LogOut } from "lucide-react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { useState, useEffect, useCallback } from "react";
+import { useMemo, useCallback } from "react";
 
 import {
   Sidebar,
@@ -36,23 +36,82 @@ import { signOut } from "@/actions/auth-actions";
 import { useAuthStore } from "@/stores/auth-store";
 import LogoDakries from "../../assets/images/logo-dakries-cafe.png";
 
-const getAvatarUrl = (url?: string | null): string | undefined => {
-  if (!url || typeof url !== "string" || url.trim() === "") {
-    return undefined;
+const getInitials = (name?: string | null): string => {
+  if (!name || typeof name !== "string") return "?";
+
+  const trimmedName = name.trim();
+  if (!trimmedName) return "?";
+
+  const words = trimmedName.split(/\s+/);
+
+  if (words.length === 1) {
+    return words[0].charAt(0).toUpperCase();
   }
-  return url;
+
+  const firstInitial = words[0].charAt(0).toUpperCase();
+  const lastInitial = words[words.length - 1].charAt(0).toUpperCase();
+
+  return `${firstInitial}${lastInitial}`;
 };
+
+const getSafeAvatarUrl = (url?: string | null): string | undefined => {
+  if (!url || typeof url !== "string") return undefined;
+
+  const trimmedUrl = url.trim();
+  if (!trimmedUrl) return undefined;
+
+  try {
+    new URL(trimmedUrl);
+    return trimmedUrl;
+  } catch {
+    return trimmedUrl.startsWith("/") ? trimmedUrl : undefined;
+  }
+};
+
+const UserProfile = ({
+  avatarUrl,
+  name,
+  role,
+  initials
+}: {
+  avatarUrl?: string;
+  name?: string;
+  role?: string;
+  initials: string;
+}) => (
+  <>
+    <Avatar className="h-8 w-8 shrink-0">
+      <AvatarImage
+        src={avatarUrl}
+        alt={name || "User"}
+        className="object-cover"
+      />
+      <AvatarFallback className="text-base font-semibold bg-gradient-to-br from-cyan-500 to-cyan-600 text-white">
+        {initials}
+      </AvatarFallback>
+    </Avatar>
+    <div className="text-sm leading-tight overflow-hidden">
+      <h4 className="truncate font-medium">{name}</h4>
+      <p className="truncate text-xs capitalize text-muted-foreground">
+        {role}
+      </p>
+    </div>
+  </>
+);
 
 export default function AppSidebar() {
   const { isMobile, open } = useSidebar();
   const pathname = usePathname();
+
   const profile = useAuthStore((state) => state.profile);
   const reset = useAuthStore((state) => state.reset);
-  const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const avatarUrl = useMemo(() => getSafeAvatarUrl(profile.avatar_url), [profile.avatar_url]);
+  const initials = useMemo(() => getInitials(profile.name), [profile.name]);
+  const menuItems = useMemo(
+    () => SIDEBAR_MENU_LIST[profile.role as SidebarMenuKey] || [],
+    [profile.role]
+  );
 
   const handleLogout = useCallback(async () => {
     try {
@@ -61,12 +120,9 @@ export default function AppSidebar() {
     } catch (error) {}
   }, [reset]);
 
-  const avatarUrl = getAvatarUrl(profile.avatar_url);
-  const initials = profile.name?.charAt(0) || "?";
-  const menuItems = SIDEBAR_MENU_LIST[profile.role as SidebarMenuKey] || [];
-
   return (
     <Sidebar collapsible="icon">
+      {/* Header */}
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
@@ -76,32 +132,30 @@ export default function AppSidebar() {
                   <div className="w-8 h-8 bg-gradient-to-br from-cyan-500 to-cyan-600 rounded-lg flex items-center justify-center shadow-lg border border-cyan-500/20 relative overflow-hidden">
                     <Image
                       src={LogoDakries}
-                      alt="Dakries Café Logo"
+                      alt="Dakries Café & Resto Logo"
                       width={40}
                       height={40}
                       priority
+                      className="object-contain"
                     />
                   </div>
                 </div>
-                {mounted ? (
-                  <span
-                    className={cn(
-                      "transition-all duration-200",
-                      !open && "opacity-0 w-0 overflow-hidden",
-                      open && "opacity-100"
-                    )}
-                  >
-                    Dakries Café & Resto
-                  </span>
-                ) : (
-                  <span className="opacity-100">Dakries Café & Resto</span>
-                )}
+                <span
+                  className={cn(
+                    "transition-all duration-200",
+                    !open && "opacity-0 w-0 overflow-hidden",
+                    open && "opacity-100"
+                  )}
+                >
+                  Dakries Café & Resto
+                </span>
               </div>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
 
+      {/* Navigation Menu */}
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupContent className="flex flex-col gap-2">
@@ -119,11 +173,11 @@ export default function AppSidebar() {
                           "px-4 py-3 h-auto transition-colors",
                           isActive
                             ? "bg-cyan-500 text-white hover:!bg-cyan-600 hover:!text-white"
-                            : "hover:bg-cyan-500 hover:text-cyan-500"
+                            : "hover:bg-cyan-500 hover:text-cyan-500 dark:hover:bg-cyan-950"
                         )}
                         aria-current={isActive ? "page" : undefined}
                       >
-                        {Icon && <Icon />}
+                        {Icon && <Icon aria-hidden="true" />}
                         <span>{item.title}</span>
                       </a>
                     </SidebarMenuButton>
@@ -135,6 +189,7 @@ export default function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
 
+      {/* Footer with User Menu */}
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
@@ -145,23 +200,13 @@ export default function AppSidebar() {
                   className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                   aria-label="User menu"
                 >
-                  <Avatar className="h-8 w-8 shrink-0">
-                    <AvatarImage
-                      src={avatarUrl}
-                      alt={profile.name}
-                      className="object-cover"
-                    />
-                    <AvatarFallback className="text-base" suppressHydrationWarning>
-                      {initials}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="text-sm leading-tight">
-                    <h4 className="truncate font-medium">{profile.name}</h4>
-                    <p className="truncate text-xs capitalize">
-                      {profile.role}
-                    </p>
-                  </div>
-                  <EllipsisVertical className="ml-auto size-4" />
+                  <UserProfile
+                    avatarUrl={avatarUrl}
+                    name={profile.name}
+                    role={profile.role}
+                    initials={initials}
+                  />
+                  <EllipsisVertical className="ml-auto size-4" aria-hidden="true" />
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
 
@@ -173,27 +218,15 @@ export default function AppSidebar() {
               >
                 <DropdownMenuLabel className="p-0 font-normal">
                   <div className="flex items-center gap-2 px-1 py-1.5">
-                    <Avatar className="h-8 w-8 shrink-0">
-                      <AvatarImage
-                        src={avatarUrl}
-                        alt={profile.name}
-                        className="h-full w-full object-cover"
-                      />
-                      <AvatarFallback className="rounded-full" suppressHydrationWarning>
-                        {initials}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="text-sm leading-tight">
-                      <h4 className="truncate font-medium">{profile.name}</h4>
-                      <p className="text-muted-foreground truncate text-xs capitalize">
-                        {profile.role}
-                      </p>
-                    </div>
+                    <UserProfile
+                      avatarUrl={avatarUrl}
+                      name={profile.name}
+                      role={profile.role}
+                      initials={initials}
+                    />
                   </div>
                 </DropdownMenuLabel>
-
                 <DropdownMenuSeparator />
-
                 <DropdownMenuGroup>
                   <DropdownMenuItem onClick={handleLogout}>
                     <LogOut />
