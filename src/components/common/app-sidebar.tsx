@@ -117,9 +117,13 @@ export default function AppSidebar() {
                   size="lg"
                   className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                 >
-                  <Avatar className="h-8 w-8 rounded-full">
-                    <AvatarImage src={profile.avatar_url} alt={profile.name} />
-                    <AvatarFallback className="rounded-full">
+                  <Avatar className="h-8 w-8 shrink-0">
+                    <AvatarImage
+                      src={profile.avatar_url}
+                      alt={profile.name}
+                      className="object-cover"
+                    />
+                    <AvatarFallback className="text-base">
                       {profile.name?.charAt(0)}
                     </AvatarFallback>
                   </Avatar>
@@ -140,10 +144,11 @@ export default function AppSidebar() {
               >
                 <DropdownMenuLabel className="p-0 font-normal">
                   <div className="flex items-center gap-2 px-1 py-1.5">
-                    <Avatar className="h-8 w-8 rounded-full">
+                    <Avatar className="h-8 w-8 shrink-0">
                       <AvatarImage
                         src={profile.avatar_url}
                         alt={profile.name}
+                        className="h-full w-full object-cover"
                       />
                       <AvatarFallback className="rounded-full">
                         {profile.name?.charAt(0)}
