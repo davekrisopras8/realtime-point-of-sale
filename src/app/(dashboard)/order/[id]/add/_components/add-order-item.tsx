@@ -15,6 +15,7 @@ import { Cart } from "@/types/order";
 import { Menu } from "@/validations/menu-validation";
 import { addOrderItem } from "../../../actions";
 import { INITIAL_STATE_ACTION } from "@/constants/general-constant";
+import CartWrapper from "./cart-wrapper";
 
 export default function AddOrderItem({ id }: { id: string }) {
   const supabase = createClient();
@@ -130,7 +131,7 @@ export default function AddOrderItem({ id }: { id: string }) {
   };
 
   return (
-    <div className="flex flex-col lg:flex-row gap-4 w-full">
+    <div className="flex flex-col lg:flex-row gap-4 w-full relative">
       <div className="space-y-4 lg:w-2/3">
         <div className="space-y-4">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 w-full">
@@ -172,15 +173,17 @@ export default function AddOrderItem({ id }: { id: string }) {
           <div className="text-center w-full">Menu not found</div>
         )}
       </div>
-      <div className="lg:w-1/3">
-        <CartSection
-          order={order}
-          carts={carts}
-          setCarts={setCarts}
-          onAddToCart={handleAddToCart}
-          isLoading={isPendingAddOrderItem}
-          onOrder={handleOrder}
-        />
+      <div className="lg:w-1/3 relative">
+        <CartWrapper>
+          <CartSection
+            order={order}
+            carts={carts}
+            setCarts={setCarts}
+            onAddToCart={handleAddToCart}
+            isLoading={isPendingAddOrderItem}
+            onOrder={handleOrder}
+          />
+        </CartWrapper>
       </div>
     </div>
   );

@@ -43,89 +43,129 @@ export default function CartSection({
 
   return (
     <Card className="w-full shadow-sm">
-      <CardContent className="space-y-4">
-        <h3 className="text-lg font-semibold"> Customer Information</h3>
-        {order && (
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label>Name</Label>
-              <Input value={order?.customer_name} disabled />
+      <CardContent className="space-y-4 flex flex-col h-full">
+        <div className="flex-shrink-0">
+          <h3 className="text-lg font-semibold">Customer Information</h3>
+          {order && (
+            <div className="space-y-4 mt-4">
+              <div className="space-y-2">
+                <Label>Name</Label>
+                <Input value={order?.customer_name} disabled />
+              </div>
+              <div className="space-y-2">
+                <Label>Table</Label>
+                <Input
+                  value={(order?.tables as unknown as { name: string })?.name}
+                  disabled
+                />
+              </div>
             </div>
-            <div className="space-y-2">
-              <Label>Table</Label>
-              <Input
-                value={(order?.tables as unknown as { name: string })?.name}
-                disabled
-              />
-            </div>
-          </div>
-        )}
-        <Separator />
-        <div className="space-y-4">
-          <h3 className="text-lg font-semibold">Cart</h3>
-          {carts.length > 0 ? (
-            carts?.map((item: Cart) => (
-              <div key={item.menu.id} className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center gap-2">
-                    <Image
-                      src={item.menu.image_url as string}
-                      alt={item.menu.name}
-                      width={30}
-                      height={30}
-                      className="rounded"
+          )}
+        </div>
+
+        <Separator className="flex-shrink-0" />
+
+        <div className="flex flex-col flex-1 min-h-0">
+          <h3 className="text-lg font-semibold flex-shrink-0 mb-4">Cart</h3>
+
+          {/* Scrollable Cart Items */}
+          <div className="flex-1 overflow-y-auto space-y-4 pr-2 custom-scrollbar">
+            {carts.length > 0 ? (
+              carts?.map((item: Cart) => (
+                <div key={item.menu.id} className="space-y-2">
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center gap-2">
+                      <Image
+                        src={item.menu.image_url as string}
+                        alt={item.menu.name}
+                        width={30}
+                        height={30}
+                        className="rounded"
+                      />
+                      <div>
+                        <p className="text-sm">{item.menu.name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {convertIDR(item.total / item.quantity)}
+                        </p>
+                      </div>
+                    </div>
+                    <p className="text-sm">{convertIDR(item.total)}</p>
+                  </div>
+                  <div className="flex items-center gap-4 w-full">
+                    <Input
+                      placeholder="Add note"
+                      className="w-full"
+                      onChange={(e) =>
+                        debounce(
+                          () => handleAddNote(item.menu!.id, e.target.value),
+                          500
+                        )
+                      }
                     />
-                    <div>
-                      <p className="text-sm">{item.menu.name}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {convertIDR(item.total / item.quantity)}
-                      </p>
+                    <div className="flex items-center gap-4">
+                      <Button
+                        className="font-semibold cursor-pointer"
+                        variant="outline"
+                        onClick={() => onAddToCart(item.menu!, "decrement")}
+                      >
+                        -
+                      </Button>
+                      <p className="font-semibold">{item.quantity}</p>
+                      <Button
+                        className="font-semibold cursor-pointer"
+                        variant="outline"
+                        onClick={() => onAddToCart(item.menu!, "increment")}
+                      >
+                        +
+                      </Button>
                     </div>
                   </div>
-                  <p className="text-sm">{convertIDR(item.total)}</p>
                 </div>
-                <div className="flex items-center gap-4 w-full">
-                  <Input
-                    placeholder="Add note"
-                    className="w-full"
-                    onChange={(e) =>
-                      debounce(
-                        () => handleAddNote(item.menu!.id, e.target.value),
-                        500
-                      )
-                    }
-                  />
-                  <div className="flex items-center gap-4">
-                    <Button
-                      className="font-semibold cursor-pointer"
-                      variant="outline"
-                      onClick={() => onAddToCart(item.menu!, "decrement")}
-                    >
-                      -
-                    </Button>
-                    <p className="font-semibold">{item.quantity}</p>
-                    <Button
-                      className="font-semibold cursor-pointer"
-                      variant="outline"
-                      onClick={() => onAddToCart(item.menu!, "increment")}
-                    >
-                      +
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            ))
-          ) : (
-            <p className="text-sm">No item in cart</p>
-          )}
-          <Button
-            className="w-full font-semibold bg-cyan-500 hover:bg-cyan-600 cursor-pointer text-white"
-            onClick={onOrder}
-          >
-            {isLoading ? <Loader2 className="animate-spin" /> : "Order"}
-          </Button>
+              ))
+            ) : (
+              <p className="text-sm text-muted-foreground">No item in cart</p>
+            )}
+          </div>
+
+          {/* Order Button - Always visible at bottom */}
+          <div className="flex-shrink-0 mt-4">
+            <Button
+              className="w-full font-semibold bg-cyan-500 hover:bg-cyan-600 cursor-pointer text-white"
+              onClick={onOrder}
+              disabled={isLoading || carts.length === 0}
+            >
+              {isLoading ? <Loader2 className="animate-spin" /> : "Order"}
+            </Button>
+          </div>
         </div>
       </CardContent>
+
+      {/* Custom Scrollbar Styles */}
+      <style jsx global>{`
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: hsl(var(--muted));
+          border-radius: 10px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: hsl(var(--muted-foreground) / 0.3);
+          border-radius: 10px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: hsl(var(--muted-foreground) / 0.5);
+        }
+
+        /* Firefox */
+        .custom-scrollbar {
+          scrollbar-width: thin;
+          scrollbar-color: hsl(var(--muted-foreground) / 0.3) hsl(var(--muted));
+        }
+      `}</style>
     </Card>
   );
 }
