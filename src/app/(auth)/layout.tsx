@@ -3,7 +3,7 @@ import { ChefHat } from "lucide-react";
 import LogoDakries from '@/assets/images/logo-dakries-cafe.png'
 import type { ReactNode } from "react";
 import Image from "next/image";
-import restaurantBg from "@/assets/images/restaurant-login-bg.jpg";
+import restaurantBg from "@/assets/images/login-bg.jpg";
 import Link from "next/link";
 
 type AuthLayoutProps = {
