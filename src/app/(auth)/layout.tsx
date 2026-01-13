@@ -1,6 +1,9 @@
 import { DarkmodeToggle } from "@/components/common/darkmode-toggle";
+import { ChefHat } from "lucide-react";
+import LogoDakries from '@/assets/images/logo-dakries-cafe.png'
 import type { ReactNode } from "react";
 import Image from "next/image";
+import restaurantBg from "@/assets/images/restaurant-login-bg.jpg";
 import Link from "next/link";
 
 type AuthLayoutProps = {
@@ -15,12 +18,7 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
           <Link href="" className="flex items-center gap-3 font-medium group">
             <div className="w-10 h-10 bg-gradient-to-br from-cyan-500 to-cyan-600 rounded-xl flex items-center justify-center shadow-lg border border-cyan-500/20 relative overflow-hidden backdrop-blur-sm">
               <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent" />
-              <Image
-                src="/images/logo-dakries-cafe.png"
-                alt="Logo"
-                width={40}
-                height={40}
-              />
+              <Image src={LogoDakries} alt="Logo" width={40} height={40} />
             </div>
             <span className="text-xl font-semibold bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text text-transparent">
               Dakries Café & Resto
@@ -42,10 +40,9 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
 
       <div className="relative hidden lg:block">
         <Image
-          src="/images/restaurant-login-bg.jpg"
+          src={restaurantBg}
           alt="Restaurant Background"
-          fill
-          className="object-cover"
+          className="absolute inset-0 h-full w-full object-cover"
           priority
         />
       </div>
