@@ -1,6 +1,6 @@
 import { DarkmodeToggle } from "@/components/common/darkmode-toggle";
 import { ChefHat } from "lucide-react";
-import LogoDakries from '../../assets/images/logo-dakries-cafe.png'
+import LogoDakries from '@/assets/images/logo-dakries-cafe.png'
 import type { ReactNode } from "react";
 import Image from "next/image";
 import restaurantBg from "@/assets/images/restaurant-login-bg.jpg";
