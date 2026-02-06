@@ -22,16 +22,17 @@ export default function Summary({
     customer_name: string;
     tables: { name: string }[];
     status: string;
+    payment_token: string;
   };
   orderMenu:
-    | { menus: Menu; quantity: number; status: string }[]
+    | { menus: Menu; quantity: number; status: string; nominal: number }[]
     | null
     | undefined;
   id: string;
 }) {
   const { grandTotal, totalPrice, tax, service } = usePricing(orderMenu);
 
-  const profile = useAuthStore((state) => state.profile)
+  const profile = useAuthStore((state) => state.profile);
 
   const isAllCompleted = useMemo(() => {
     return orderMenu?.every((item) => item.status === "Completed");
@@ -44,13 +45,17 @@ export default function Summary({
   ] = useActionState(generatePayment, INITIAL_STATE_GENERATE_PAYMENT);
 
   const handleGeneratePayment = () => {
-    const formData = new FormData();
-    formData.append("id", id || "");
-    formData.append("gross_amount", grandTotal.toString());
-    formData.append("customer_name", order?.customer_name || "");
-    startTransition(() => {
-      generatePaymentAction(formData);
-    });
+    if (order?.payment_token) {
+      window.snap.pay(order.payment_token);
+    } else {
+      const formData = new FormData();
+      formData.append("id", id || "");
+      formData.append("gross_amount", grandTotal.toString());
+      formData.append("customer_name", order?.customer_name || "");
+      startTransition(() => {
+        generatePaymentAction(formData);
+      });
+    }
   };
 
   useEffect(() => {
@@ -103,11 +108,15 @@ export default function Summary({
             <p className="text-lg font-semibold">Total</p>
             <p className="text-lg font-semibold">{convertIDR(grandTotal)}</p>
           </div>
-          {order?.status === "Process" && profile.role !== 'kitchen' && (
+          {order?.status === "Process" && profile.role !== "kitchen" && (
             <Button
               type="submit"
               onClick={handleGeneratePayment}
-              disabled={!isAllCompleted || isPendingGeneratePayment || orderMenu?.length === 0}
+              disabled={
+                !isAllCompleted ||
+                isPendingGeneratePayment ||
+                orderMenu?.length === 0
+              }
               className="w-full font-semibold bg-teal-500 hover:bg-teal-600 text-white cursor-pointer"
             >
               {isPendingGeneratePayment ? (

@@ -30,12 +30,21 @@ export default function CardMenu({
         </p>
       </CardContent>
       <CardFooter className="p-3 sm:p-4 flex justify-between items-center gap-2">
-        <div className="text-sm sm:text-base lg:text-xl font-bold flex-1 min-w-0">
-          {convertIDR(menu.price)}
+        <div>
+          {menu.discount > 0 && (
+            <div className="text-sm line-through text-muted-foreground">
+              {convertIDR(menu.price)}
+            </div>
+          )}
+          <div className="text-sm sm:text-base lg:text-xl font-bold flex-1 min-w-0">
+            {menu.discount > 0
+              ? convertIDR(menu.price - menu.price * (menu.discount / 100))
+              : convertIDR(menu.price)}
+          </div>
         </div>
         <Button
           className="cursor-pointer flex-shrink-0 h-8 w-8 sm:h-9 sm:w-9 lg:h-10 lg:w-10 p-0"
-          onClick={() => onAddToCart(menu, 'increment')}
+          onClick={() => onAddToCart(menu, "increment")}
           size="sm"
         >
           <ShoppingCart className="h-3 w-3 sm:h-4 sm:w-4 lg:h-5 lg:w-5" />

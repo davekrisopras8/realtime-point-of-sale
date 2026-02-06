@@ -22,6 +22,7 @@ const Receipt = ({
         quantity: number;
         status: string;
         id: string;
+        nominal: number;
       }[]
     | null
     | undefined;
