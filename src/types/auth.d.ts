@@ -8,6 +8,10 @@ export type AuthFormState = {
     avatar_url?: string[];
     _form?: string[];
   }
+  data?: {
+    emailChanged?: boolean;
+    newEmail?: string; 
+  };
 }
 
 export type Profile = {
@@ -15,5 +19,6 @@ export type Profile = {
   name?: string;
   avatar_url?: string;
   role?: string;
+  email?: string;
 }
 

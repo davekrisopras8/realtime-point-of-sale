@@ -87,6 +87,7 @@ export async function updateUser(prevState: AuthFormState, formData: FormData) {
   let validatedFields = updateUserSchema.safeParse({
     name: formData.get("name"),
     role: formData.get("role"),
+    email: formData.get("email"),
     avatar_url: formData.get("avatar_url"),
   });
 
@@ -128,38 +129,68 @@ export async function updateUser(prevState: AuthFormState, formData: FormData) {
     };
   }
 
-  const supabase = await createClient();
+  const supabase = await createClient({ isManager: true });
+  const userId = formData.get("id") as string;
+  const oldEmail = formData.get("old_email") as string;
+  const newEmail = validatedFields.data.email;
 
-  const { error } = await supabase
+  const emailChanged = oldEmail !== newEmail;
+
+  if (emailChanged) {
+    const { error: emailError } = await supabase.auth.admin.updateUserById(
+      userId,
+      {
+        email: newEmail,
+        email_confirm: false, // Force email verification
+      }
+    );
+
+    if (emailError) {
+      return {
+        status: "error",
+        errors: {
+          ...prevState.errors,
+          _form: [
+            `Failed to update email: ${emailError.message}. The email might already be in use.`,
+          ],
+        },
+      };
+    }
+  }
+
+  const { error: profileError } = await supabase
     .from("profiles")
     .update({
       name: validatedFields.data.name,
       role: validatedFields.data.role,
       avatar_url: validatedFields.data.avatar_url,
+      email: validatedFields.data.email, 
     })
-    .eq("id", formData.get("id"));
+    .eq("id", userId);
 
-  if (error) {
+  if (profileError) {
     return {
       status: "error",
       errors: {
         ...prevState.errors,
-        _form: [error.message],
+        _form: [profileError.message],
       },
     };
   }
 
+  // ✅ Update cookie if current user is being updated
   const cookiesStore = await cookies();
   const currentProfile = JSON.parse(
     cookiesStore.get("user_profile")?.value ?? "{}"
   );
 
-  if (currentProfile.id === formData.get("id")) {
+  if (currentProfile.id === userId) {
     const updatedProfile = {
       ...currentProfile,
       name: validatedFields.data.name,
       role: validatedFields.data.role,
       avatar_url: validatedFields.data.avatar_url,
+      email: validatedFields.data.email,
     };
 
     cookiesStore.set("user_profile", JSON.stringify(updatedProfile), {
@@ -172,8 +203,13 @@ export async function updateUser(prevState: AuthFormState, formData: FormData) {
 
   revalidatePath("/manager/user");
 
+  // ✅ Return success with email change info
   return {
     status: "success",
+    data: {
+      emailChanged,
+      newEmail: emailChanged ? newEmail : undefined,
+    },
   };
 }
 

@@ -44,6 +44,7 @@ export const INITIAL_STATE_UPDATE_USER = {
   errors: {
     name: [],
     role: [],
+    email: [],
     avatar_url: [],
     _form: [],
   },

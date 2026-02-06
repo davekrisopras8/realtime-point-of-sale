@@ -25,6 +25,7 @@ export const createUserSchema = z.object({
 export const updateUserSchema = z.object({
   name: z.string().min(1, "Name is required"),
   role: z.string().min(1, "Role is required"),
+  email: z.string().min(1, "Email is required").email("Please enter a valid email"),
   avatar_url: z.union([
     z.string().min(1, "Image URL is required"),
     z.instanceof(File),
